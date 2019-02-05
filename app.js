@@ -17,5 +17,6 @@ app.use(
 app.use(bodyParser.json());
 app.post('/login', handlers.login.post);
 app.get('/admin', verifyToken, handlers.admin.get);
+app.use('/', express.static(__dirname + '/client/dist'));
 
 module.exports = app;

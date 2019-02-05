@@ -1,0 +1,14 @@
+{
+  "name": "jwthelloworld-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "postinstall": "parcel build index.html"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.11.0"
+  }
+}
