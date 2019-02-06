@@ -10,6 +10,7 @@ module.exports.post = (req, res) => {
 
   if (!username || !password) {
     return res.status(400).json({
+      success: false,
       message: 'Authentication failed! Please check the request',
     });
   }
@@ -20,11 +21,13 @@ module.exports.post = (req, res) => {
     });
 
     return res.json({
+      success: true,
       message: 'Authentication successful!',
       token,
     });
   } else {
     return res.status(403).json({
+      success: false,
       message: 'Incorrect username or password',
     });
   }
