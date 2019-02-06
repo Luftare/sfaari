@@ -7,15 +7,17 @@ function isValidCredentials(username, password) {
 
 module.exports.post = (req, res) => {
   const { username, password } = req.body;
-
-  if (!username || !password) {
+  const requiredCredentialsProvided = username && password;
+  if (!requiredCredentialsProvided) {
     return res.status(400).json({
       success: false,
       message: 'Authentication failed! Please check the request',
     });
   }
 
-  if (isValidCredentials(username, password)) {
+  const validCredentialsProvided = isValidCredentials(username, password);
+
+  if (validCredentialsProvided) {
     const token = jwt.sign({ username }, process.env.SECRET, {
       expiresIn: '1h',
     });
