@@ -1,8 +1,9 @@
 const request = require('supertest');
-const app = require('../app');
+const { app, init } = require('../app');
 
 describe('/', () => {
-  it('GET', done => {
+  it('GET', async done => {
+    await init();
     request(app)
       .get('/')
       .expect('Content-Type', /text\/html/)

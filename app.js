@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 
 const { verifyToken } = require('./middleware');
 const handlers = require('./handlers');
+const dataAccessObject = require('./dataAccessObject');
 const app = express();
 
 app.use(
@@ -17,6 +18,11 @@ app.use(
 app.use(bodyParser.json());
 app.post('/login', handlers.login.post);
 app.get('/admin', verifyToken, handlers.admin.get);
+app.get('/users', handlers.users.get);
 app.use('/', express.static(__dirname + '/client/dist'));
 
-module.exports = app;
+async function init() {
+  return await dataAccessObject.init();
+}
+
+module.exports = { app, init };

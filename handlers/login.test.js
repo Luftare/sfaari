@@ -1,8 +1,9 @@
 const request = require('supertest');
-const app = require('../app');
+const { app, init } = require('../app');
 
 describe('/login', () => {
-  it('POST with invalid credentials', done => {
+  it('POST with invalid credentials', async done => {
+    await init();
     request(app)
       .post('/login')
       .set('Accept', 'application/json')
@@ -14,7 +15,8 @@ describe('/login', () => {
       .expect(403, done);
   });
 
-  it('POST with missing credentials', done => {
+  it('POST with missing credentials', async done => {
+    await init();
     request(app)
       .post('/login')
       .set('Accept', 'application/json')
@@ -22,7 +24,8 @@ describe('/login', () => {
       .expect(400, done);
   });
 
-  it('POST with valid credentials', done => {
+  it('POST with valid credentials', async done => {
+    await init();
     request(app)
       .post('/login')
       .set('Accept', 'application/json')
@@ -31,6 +34,11 @@ describe('/login', () => {
         password: 'mock_password',
       })
       .expect('Content-Type', /json/)
-      .expect(200, done);
+      .expect(200)
+      .end((err, res) => {
+        if (err) console.log(err);
+        expect(res.body.token).toBeDefined();
+        done();
+      });
   });
 });

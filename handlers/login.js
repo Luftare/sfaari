@@ -8,6 +8,7 @@ function isValidCredentials(username, password) {
 module.exports.post = (req, res) => {
   const { username, password } = req.body;
   const requiredCredentialsProvided = username && password;
+
   if (!requiredCredentialsProvided) {
     return res.status(400).json({
       success: false,

@@ -1,4 +1,6 @@
 const port = process.env.PORT || 8000;
-const app = require('./app');
+const { init, app } = require('./app');
 
-app.listen(port, () => console.log(`API running at: ${port}`));
+init().then(() => {
+  app.listen(port, () => console.log(`API running at: ${port}`));
+});

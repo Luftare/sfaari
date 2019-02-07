@@ -1,8 +1,9 @@
 const request = require('supertest');
-const app = require('../app');
+const { app, init } = require('../app');
 
 describe('/admin', () => {
-  it('GET with invalid token', done => {
+  it('GET with invalid token', async done => {
+    await init();
     request(app)
       .get('/admin')
       .set('Accept', 'application/json')
@@ -10,7 +11,7 @@ describe('/admin', () => {
       .expect(403, done);
   });
 
-  it('GET with valid token', done => {
+  it('GET with valid token', async done => {
     loginUser(token => {
       request(app)
         .get('/admin')
@@ -22,7 +23,8 @@ describe('/admin', () => {
   });
 });
 
-function loginUser(onLoggedIn) {
+async function loginUser(onLoggedIn) {
+  await init();
   request(app)
     .post('/login')
     .set('Accept', 'application/json')
