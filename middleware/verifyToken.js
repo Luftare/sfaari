@@ -66,7 +66,10 @@ module.exports = {
       }
 
       const tokenPayload = parseJwtPayload(token);
-      const isAdmin = tokenPayload && tokenPayload.isAdmin;
+      const isAdmin =
+        tokenPayload &&
+        tokenPayload.groups &&
+        tokenPayload.groups.includes('admin');
 
       if (!isAdmin) {
         return res.status(403).json({
