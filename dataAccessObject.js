@@ -170,7 +170,7 @@ module.exports = {
   async getAllUsers() {
     try {
       const { db } = this;
-      return await db.all('SELECT (username) FROM User');
+      return await db.all('SELECT username, id FROM User');
     } catch (err) {
       throw err;
     }
