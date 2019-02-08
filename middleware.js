@@ -14,7 +14,7 @@ function verifyToken(req, res, next) {
   if (!authHeader) {
     return res.status(403).json({
       success: false,
-      message: 'Auth token is not supplied',
+      error: 'Auth token is not supplied',
     });
   }
 
@@ -24,7 +24,7 @@ function verifyToken(req, res, next) {
     if (err) {
       return res.status(403).json({
         success: false,
-        message: 'Token is not valid',
+        error: 'Token is not valid',
       });
     } else {
       req.decoded = decoded;

@@ -140,6 +140,33 @@ module.exports = {
     };
   },
 
+  async updateUserUsername(id, username) {
+    const user = await this.getUserById(id);
+
+    if (!user) {
+      throw new Error('User not found.');
+    }
+
+    return await this.db.run('UPDATE User SET username = (?) WHERE id = (?)', [
+      username,
+      id,
+    ]);
+  },
+
+  async updateUserPassword(id, password) {
+    const user = await this.getUserById(id);
+
+    if (!user) {
+      throw new Error('User not found.');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
+    return await this.db.run('UPDATE User SET password = (?) WHERE id = (?)', [
+      hashedPassword,
+      id,
+    ]);
+  },
+
   async getAllUsers() {
     try {
       const { db } = this;

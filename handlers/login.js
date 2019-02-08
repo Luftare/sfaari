@@ -9,7 +9,7 @@ module.exports.post = async (req, res) => {
   if (!requiredCredentialsProvided) {
     return res.status(400).json({
       success: false,
-      message: 'Authentication failed! Please check the request',
+      error: 'Authentication failed! Please check the request',
     });
   }
 
@@ -36,7 +36,7 @@ module.exports.post = async (req, res) => {
   } else {
     return res.status(403).json({
       success: false,
-      message: 'Incorrect username or password',
+      error: 'Incorrect username or password',
     });
   }
 };

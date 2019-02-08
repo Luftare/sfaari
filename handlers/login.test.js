@@ -36,7 +36,7 @@ describe('/login', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end((err, res) => {
-        if (err) console.log(err);
+        if (err) throw err;
         expect(res.body.token).toBeDefined();
         done();
       });
@@ -54,7 +54,7 @@ describe('/login', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end((err, res) => {
-        if (err) console.log(err);
+        if (err) throw err;
         expect(res.body.token).toBeDefined();
         expect(res.body.roles.includes('admin')).toEqual(true);
         done();
