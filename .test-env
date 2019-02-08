@@ -1,3 +1,3 @@
 SECRET=mock_secret
-USERNAME=mock_username
-PASSWORD=mock_password
+ADMIN_USERNAME=admin_mock
+ADMIN_PASSWORD=mock_password

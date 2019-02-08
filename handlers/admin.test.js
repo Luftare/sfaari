@@ -12,7 +12,7 @@ describe('/admin', () => {
   });
 
   it('GET with valid token', async done => {
-    loginUser(token => {
+    loginAdminUser(token => {
       request(app)
         .get('/admin')
         .set('Authorization', token)
@@ -21,7 +21,34 @@ describe('/admin', () => {
         .expect(200, done);
     });
   });
+
+  it('GET with valid non-admin token', async done => {
+    loginUser(token => {
+      request(app)
+        .get('/admin')
+        .set('Authorization', token)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(403, done);
+    });
+  });
 });
+
+async function loginAdminUser(onLoggedIn) {
+  await init();
+  request(app)
+    .post('/login')
+    .set('Accept', 'application/json')
+    .send({
+      username: process.env.ADMIN_USERNAME,
+      password: process.env.ADMIN_PASSWORD,
+    })
+    .expect(200)
+    .end((err, res) => {
+      if (err) throw err;
+      onLoggedIn(res.body.token);
+    });
+}
 
 async function loginUser(onLoggedIn) {
   await init();
@@ -29,8 +56,8 @@ async function loginUser(onLoggedIn) {
     .post('/login')
     .set('Accept', 'application/json')
     .send({
-      username: 'mock_username',
-      password: 'mock_password',
+      username: 'someone',
+      password: 'passwordz',
     })
     .expect(200)
     .end((err, res) => {

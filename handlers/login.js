@@ -1,11 +1,8 @@
 const jwt = require('jsonwebtoken');
+const dataAccessObject = require('../dataAccessObject');
 const isTestEnvironment = process.env.NODE_ENV === 'test';
 
-function isValidCredentials(username, password) {
-  return username === process.env.USERNAME && password === process.env.PASSWORD;
-}
-
-module.exports.post = (req, res) => {
+module.exports.post = async (req, res) => {
   const { username, password } = req.body;
   const requiredCredentialsProvided = username && password;
 
@@ -16,16 +13,23 @@ module.exports.post = (req, res) => {
     });
   }
 
-  const validCredentialsProvided = isValidCredentials(username, password);
+  const validCredentialsProvided = await dataAccessObject.checkUserCredentialValidity(
+    username,
+    password
+  );
 
   if (validCredentialsProvided) {
-    const token = jwt.sign({ username }, process.env.SECRET, {
+    const user = await dataAccessObject.getUser(username);
+    const isAdmin = user.isAdmin === 1;
+
+    const token = jwt.sign({ username, isAdmin }, process.env.SECRET, {
       expiresIn: '1h',
     });
 
     return res.json({
       success: true,
       message: 'Authentication successful!',
+      isAdmin,
       token,
     });
   } else {

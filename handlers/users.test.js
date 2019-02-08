@@ -4,22 +4,46 @@ const { initTestDatabaseState } = require('../databaseTestUtils');
 
 describe('/users', () => {
   it('GET', async done => {
-    await init();
-    request(app)
-      .get('/users')
-      .set('Accept', 'application/json')
-      .expect('Content-Type', /json/)
-      .expect(200)
-      .end((err, res) => {
-        if (err) console.log(err);
-        const { users } = res.body;
-        expect(users).toBeInstanceOf(Array);
-        expect(users).toHaveLength(3);
+    loginUser(async token => {
+      request(app)
+        .get('/users')
+        .set('Authorization', token)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end((err, res) => {
+          if (err) console.log(err);
+          const { users } = res.body;
+          expect(users).toBeInstanceOf(Array);
+          expect(users).toHaveLength(3);
 
-        ['mocker', 'someone', 'someone_else'].forEach(testName => {
-          expect(users.some(user => user.username === testName)).toBeTruthy();
+          ['mocker', 'someone', 'someone_else'].forEach(testName => {
+            expect(users.some(user => user.username === testName)).toBeTruthy();
+          });
+
+          expect(
+            !!users.some(
+              ({ username }) => username === process.env.ADMIN_USERNAME
+            )
+          ).toEqual(false);
+          done();
         });
-        done();
-      });
+    });
   });
 });
+
+async function loginUser(onLoggedIn) {
+  await init();
+  request(app)
+    .post('/login')
+    .set('Accept', 'application/json')
+    .send({
+      username: 'someone',
+      password: 'passwordz',
+    })
+    .expect(200)
+    .end((err, res) => {
+      if (err) throw err;
+      onLoggedIn(res.body.token);
+    });
+}

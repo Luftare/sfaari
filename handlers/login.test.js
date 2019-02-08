@@ -30,14 +30,33 @@ describe('/login', () => {
       .post('/login')
       .set('Accept', 'application/json')
       .send({
-        username: 'mock_username',
-        password: 'mock_password',
+        username: 'someone',
+        password: 'passwordz',
       })
       .expect('Content-Type', /json/)
       .expect(200)
       .end((err, res) => {
         if (err) console.log(err);
         expect(res.body.token).toBeDefined();
+        done();
+      });
+  });
+
+  it('POST with valid admin credentials', async done => {
+    await init();
+    request(app)
+      .post('/login')
+      .set('Accept', 'application/json')
+      .send({
+        username: process.env.ADMIN_USERNAME,
+        password: process.env.ADMIN_PASSWORD,
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .end((err, res) => {
+        if (err) console.log(err);
+        expect(res.body.token).toBeDefined();
+        expect(res.body.isAdmin).toEqual(true);
         done();
       });
   });
