@@ -71,7 +71,7 @@ module.exports = {
 
   async checkUserCredentialValidity(username, password) {
     try {
-      const user = await this.getUser(username);
+      const user = await this.getUserByName(username);
       const userExists = user && user.username;
       if (!userExists) return false;
 
@@ -95,7 +95,33 @@ module.exports = {
     return role;
   },
 
-  async getUser(username) {
+  async getUserRolesById(id) {
+    const rolesObject = await this.db.all(
+      `SELECT name FROM Role INNER JOIN UserRole ON Role.id = UserRole.roleId WHERE UserRole.userId = (?)`,
+      [id]
+    );
+
+    return rolesObject.map(({ name }) => name);
+  },
+
+  async getUserById(id) {
+    const user = await this.db.get(`SELECT * FROM User WHERE id = (?)`, [id]);
+
+    const userNotFound = !user;
+
+    if (userNotFound) {
+      return null;
+    }
+
+    const roles = await this.getUserRolesById(user.id);
+
+    return {
+      ...user,
+      roles,
+    };
+  },
+
+  async getUserByName(username) {
     const user = await this.db.get(`SELECT * FROM User WHERE username = (?)`, [
       username,
     ]);
@@ -106,12 +132,7 @@ module.exports = {
       return null;
     }
 
-    const roleObjects = await this.db.all(
-      `SELECT name FROM Role INNER JOIN UserRole ON Role.id = UserRole.roleId WHERE UserRole.userId = (?)`,
-      [user.id]
-    );
-
-    const roles = roleObjects.map(({ name }) => name);
+    const roles = await this.getUserRolesById(user.id);
 
     return {
       ...user,
@@ -159,7 +180,7 @@ module.exports = {
         password === process.env.ADMIN_PASSWORD;
 
       if (adminCredentialsProvided) {
-        const user = await this.getUser(username);
+        const user = await this.getUserByName(username);
         const role = await this.getRole('admin');
 
         return await db.run(

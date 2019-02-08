@@ -2,7 +2,7 @@ const request = require('supertest');
 const { app, init } = require('../app');
 
 describe('/admin', () => {
-  it('GET with invalid token', async done => {
+  it('GET /admin with invalid token', async done => {
     await init();
     request(app)
       .get('/admin')
@@ -11,7 +11,7 @@ describe('/admin', () => {
       .expect(403, done);
   });
 
-  it('GET with valid token', async done => {
+  it('GET /admin with valid token', async done => {
     loginAdminUser(token => {
       request(app)
         .get('/admin')
@@ -22,7 +22,7 @@ describe('/admin', () => {
     });
   });
 
-  it('GET with valid non-admin token', async done => {
+  it('GET /admin with valid non-admin token', async done => {
     loginUser(token => {
       request(app)
         .get('/admin')

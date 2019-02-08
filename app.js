@@ -18,7 +18,8 @@ app.use(
 app.use(bodyParser.json());
 app.post('/login', handlers.login.post);
 app.get('/admin', verifyToken.admin, handlers.admin.get);
-app.get('/users', verifyToken.any, handlers.users.get);
+app.get('/users', verifyToken.any, handlers.users.getAll);
+app.get('/users/:id', verifyToken.any, handlers.users.get);
 app.use('/', express.static(__dirname + '/client/dist'));
 
 async function init() {

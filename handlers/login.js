@@ -19,10 +19,11 @@ module.exports.post = async (req, res) => {
   );
 
   if (validCredentialsProvided) {
-    const user = await dataAccessObject.getUser(username);
+    const user = await dataAccessObject.getUserByName(username);
     const isAdmin = user.roles.includes('admin');
     const roles = isAdmin ? ['admin'] : [];
-    const token = jwt.sign({ username, roles }, process.env.SECRET, {
+    const id = user.id;
+    const token = jwt.sign({ username, id, roles }, process.env.SECRET, {
       expiresIn: '1h',
     });
 

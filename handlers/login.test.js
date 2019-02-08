@@ -2,7 +2,7 @@ const request = require('supertest');
 const { app, init } = require('../app');
 
 describe('/login', () => {
-  it('POST with invalid credentials', async done => {
+  it('POST /login with invalid credentials', async done => {
     await init();
     request(app)
       .post('/login')
@@ -15,7 +15,7 @@ describe('/login', () => {
       .expect(403, done);
   });
 
-  it('POST with missing credentials', async done => {
+  it('POST /login with missing credentials', async done => {
     await init();
     request(app)
       .post('/login')
@@ -24,7 +24,7 @@ describe('/login', () => {
       .expect(400, done);
   });
 
-  it('POST with valid credentials', async done => {
+  it('POST /login with valid credentials', async done => {
     await init();
     request(app)
       .post('/login')
@@ -42,7 +42,7 @@ describe('/login', () => {
       });
   });
 
-  it('POST with valid admin credentials', async done => {
+  it('POST /login with valid admin credentials', async done => {
     await init();
     request(app)
       .post('/login')
