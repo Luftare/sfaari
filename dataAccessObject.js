@@ -12,7 +12,11 @@ module.exports = {
   db: null,
   async init() {
     this.db = await sqlite.open(databasePath);
-    await this.setupDatabaseTables();
+    try {
+      await this.setupDatabaseTables();
+    } catch (err) {
+      console.log(err);
+    }
 
     const adminUserExists = await this.userWithUsernameExists(
       process.env.ADMIN_USERNAME
@@ -31,15 +35,38 @@ module.exports = {
   },
 
   async setupDatabaseTables() {
-    return await this.db.run(
-      `CREATE TABLE IF NOT EXISTS users
+    await this.db.run(
+      `CREATE TABLE IF NOT EXISTS User
       (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        isAdmin INTEGER
+        password TEXT NOT NULL
       )`
     );
+
+    await this.db.run(
+      `CREATE TABLE IF NOT EXISTS Role
+      (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE
+      )`
+    );
+
+    await this.db.run(
+      `CREATE TABLE IF NOT EXISTS UserRole
+      (
+        userId INTEGER,
+        roleId INTEGER,
+        FOREIGN KEY(userId) REFERENCES User(id),
+        FOREIGN KEY(roleId) REFERENCES Role(id)
+      )`
+    );
+
+    await this.db.run(`
+      INSERT INTO Role (name)
+      SELECT 'admin'
+      WHERE NOT EXISTS(SELECT 1 FROM Role WHERE name = 'admin')
+    `);
   },
 
   async checkUserCredentialValidity(username, password) {
@@ -60,18 +87,42 @@ module.exports = {
     }
   },
 
+  async getRole(name) {
+    const role = await this.db.get(`SELECT * FROM Role WHERE name = (?)`, [
+      name,
+    ]);
+
+    return role;
+  },
+
   async getUser(username) {
-    const user = await this.db.get(`SELECT * FROM users WHERE username = (?)`, [
+    const user = await this.db.get(`SELECT * FROM User WHERE username = (?)`, [
       username,
     ]);
 
-    return user;
+    const userNotFound = !user;
+
+    if (userNotFound) {
+      return null;
+    }
+
+    const roleObjects = await this.db.all(
+      `SELECT name FROM Role INNER JOIN UserRole ON Role.id = UserRole.roleId WHERE UserRole.userId = (?)`,
+      [user.id]
+    );
+
+    const roles = roleObjects.map(({ name }) => name);
+
+    return {
+      ...user,
+      roles,
+    };
   },
 
   async getAllUsers() {
     try {
       const { db } = this;
-      return await db.all('SELECT (username) FROM users WHERE isAdmin = 0');
+      return await db.all('SELECT (username) FROM User');
     } catch (err) {
       throw err;
     }
@@ -79,7 +130,7 @@ module.exports = {
 
   async userWithUsernameExists(username) {
     const existingUser = await this.db.get(
-      `SELECT * FROM users WHERE username = (?)
+      `SELECT * FROM User WHERE username = (?)
       `,
       [username]
     );
@@ -97,14 +148,27 @@ module.exports = {
       }
 
       const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
+
+      await db.run('INSERT INTO User (username, password) VALUES (?, ?)', [
+        username,
+        hashedPassword,
+      ]);
+
       const adminCredentialsProvided =
         username === process.env.ADMIN_USERNAME &&
         password === process.env.ADMIN_PASSWORD;
-      const isAdmin = adminCredentialsProvided ? 1 : 0;
-      return await db.run(
-        'INSERT INTO users (username, password, isAdmin) VALUES (?, ?, ?)',
-        [username, hashedPassword, isAdmin]
-      );
+
+      if (adminCredentialsProvided) {
+        const user = await this.getUser(username);
+        const role = await this.getRole('admin');
+
+        return await db.run(
+          'INSERT INTO UserRole (userId, roleId) VALUES (?, ?)',
+          [user.id, role.id]
+        );
+      } else {
+        return;
+      }
     } catch (err) {
       console.log(err);
       return false;

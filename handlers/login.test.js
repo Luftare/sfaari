@@ -56,7 +56,7 @@ describe('/login', () => {
       .end((err, res) => {
         if (err) console.log(err);
         expect(res.body.token).toBeDefined();
-        expect(res.body.isAdmin).toEqual(true);
+        expect(res.body.roles.includes('admin')).toEqual(true);
         done();
       });
   });

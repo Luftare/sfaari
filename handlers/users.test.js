@@ -15,17 +15,11 @@ describe('/users', () => {
           if (err) console.log(err);
           const { users } = res.body;
           expect(users).toBeInstanceOf(Array);
-          expect(users).toHaveLength(3);
+          expect(users).toHaveLength(4);
 
           ['mocker', 'someone', 'someone_else'].forEach(testName => {
             expect(users.some(user => user.username === testName)).toBeTruthy();
           });
-
-          expect(
-            !!users.some(
-              ({ username }) => username === process.env.ADMIN_USERNAME
-            )
-          ).toEqual(false);
           done();
         });
     });

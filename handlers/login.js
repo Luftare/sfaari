@@ -20,16 +20,16 @@ module.exports.post = async (req, res) => {
 
   if (validCredentialsProvided) {
     const user = await dataAccessObject.getUser(username);
-    const isAdmin = user.isAdmin === 1;
-    const groups = isAdmin ? ['admin'] : [];
-    const token = jwt.sign({ username, groups }, process.env.SECRET, {
+    const isAdmin = user.roles.includes('admin');
+    const roles = isAdmin ? ['admin'] : [];
+    const token = jwt.sign({ username, roles }, process.env.SECRET, {
       expiresIn: '1h',
     });
 
     return res.json({
       success: true,
       message: 'Authentication successful!',
-      isAdmin,
+      roles,
       token,
     });
   } else {
