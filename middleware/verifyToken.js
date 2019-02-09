@@ -19,7 +19,7 @@ function getTokenFromRequest(req) {
 }
 
 module.exports = {
-  async any(req, res, next) {
+  async hasValidToken(req, res, next) {
     const token = getTokenFromRequest(req);
 
     if (!token) {
@@ -54,36 +54,20 @@ module.exports = {
     next();
   },
 
-  async admin(req, res, next) {
-    const token = getTokenFromRequest(req);
+  hasRoles(requiredRoles) {
+    return async (req, res, next) => {
+      const { tokenPayload } = req;
+      const userRoles = tokenPayload.roles;
+      const hasRoles = requiredRoles.every(role => userRoles.includes(role));
 
-    if (!token) {
-      return res.status(403).json({
-        success: false,
-        error: 'Auth token is not supplied'
-      });
-    }
-
-    jwt.verify(token, process.env.SECRET, (err, tokenPayload) => {
-      if (err) {
-        return res.status(403).json({
-          success: false,
-          error: 'Token is not valid'
-        });
-      }
-
-      const isAdmin =
-        tokenPayload.roles && tokenPayload.roles.includes('admin');
-
-      if (!isAdmin) {
+      if (hasRoles) {
+        next();
+      } else {
         return res.status(403).json({
           success: false,
           error: 'Invalid privileges'
         });
       }
-
-      req.tokenPayload = tokenPayload;
-      next();
-    });
+    };
   }
 };
