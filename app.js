@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
   bodyParser.urlencoded({
-    extended: true,
+    extended: true
   })
 );
 app.use(bodyParser.json());

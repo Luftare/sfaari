@@ -25,18 +25,18 @@ module.exports = {
     if (!token) {
       return res.status(403).json({
         success: false,
-        error: 'Auth token is not supplied',
+        error: 'Auth token is not supplied'
       });
     }
 
-    jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET, (err, tokenPayload) => {
       if (err) {
         return res.status(403).json({
           success: false,
-          error: 'Token is not valid',
+          error: 'Token is not valid'
         });
       } else {
-        req.decoded = decoded;
+        req.tokenPayload = tokenPayload;
         next();
       }
     });
@@ -44,10 +44,10 @@ module.exports = {
 
   ownUserId(req, res, next) {
     const userId = parseInt(req.params.userId);
-    if (userId !== req.decoded.id) {
+    if (userId !== req.tokenPayload.id) {
       return res.status(403).json({
         success: false,
-        error: 'No privileges.',
+        error: 'No privileges.'
       });
     }
 
@@ -60,29 +60,30 @@ module.exports = {
     if (!token) {
       return res.status(403).json({
         success: false,
-        error: 'Auth token is not supplied',
+        error: 'Auth token is not supplied'
       });
     }
 
-    jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET, (err, tokenPayload) => {
       if (err) {
         return res.status(403).json({
           success: false,
-          error: 'Token is not valid',
+          error: 'Token is not valid'
         });
       }
 
-      const isAdmin = decoded.roles && decoded.roles.includes('admin');
+      const isAdmin =
+        tokenPayload.roles && tokenPayload.roles.includes('admin');
 
       if (!isAdmin) {
         return res.status(403).json({
           success: false,
-          error: 'Invalid privileges',
+          error: 'Invalid privileges'
         });
       }
 
-      req.decoded = decoded;
+      req.tokenPayload = tokenPayload;
       next();
     });
-  },
+  }
 };
