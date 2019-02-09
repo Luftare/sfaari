@@ -5,7 +5,7 @@ require('dotenv').config({ path: envFilePath });
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const verifyToken = require('./middleware/verifyToken');
+const { any, admin, ownUserId } = require('./middleware/verifyToken');
 const handlers = require('./handlers');
 const dataAccessObject = require('./dataAccessObject');
 const app = express();
@@ -17,21 +17,12 @@ app.use(
 );
 app.use(bodyParser.json());
 app.post('/login', handlers.login.post);
-app.get('/admin', verifyToken.admin, handlers.admin.get);
-app.get('/users', verifyToken.any, handlers.users.getAll);
-app.get('/users/:userId', verifyToken.any, handlers.users.get);
-app.put(
-  '/users/:userId/username',
-  verifyToken.any,
-  verifyToken.ownUserId,
-  handlers.users.putUsername
-);
-app.put(
-  '/users/:userId/password',
-  verifyToken.any,
-  verifyToken.ownUserId,
-  handlers.users.putPassword
-);
+app.get('/admin', admin, handlers.admin.get);
+app.get('/users', handlers.users.getAll);
+app.post('/users', handlers.users.post);
+app.get('/users/:userId', handlers.users.get);
+app.put('/users/:userId/username', any, ownUserId, handlers.users.putUsername);
+app.put('/users/:userId/password', any, ownUserId, handlers.users.putPassword);
 app.use('/', express.static(__dirname + '/client/dist'));
 
 async function init() {

@@ -89,7 +89,7 @@ module.exports = {
 
   async getRole(name) {
     const role = await this.db.get(`SELECT * FROM Role WHERE name = (?)`, [
-      name,
+      name
     ]);
 
     return role;
@@ -117,13 +117,13 @@ module.exports = {
 
     return {
       ...user,
-      roles,
+      roles
     };
   },
 
   async getUserByName(username) {
     const user = await this.db.get(`SELECT * FROM User WHERE username = (?)`, [
-      username,
+      username
     ]);
 
     const userNotFound = !user;
@@ -136,7 +136,7 @@ module.exports = {
 
     return {
       ...user,
-      roles,
+      roles
     };
   },
 
@@ -149,7 +149,7 @@ module.exports = {
 
     return await this.db.run('UPDATE User SET username = (?) WHERE id = (?)', [
       username,
-      id,
+      id
     ]);
   },
 
@@ -163,14 +163,14 @@ module.exports = {
     const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
     return await this.db.run('UPDATE User SET password = (?) WHERE id = (?)', [
       hashedPassword,
-      id,
+      id
     ]);
   },
 
   async getAllUsers() {
     try {
       const { db } = this;
-      return await db.all('SELECT username, id FROM User');
+      return await db.all('SELECT * FROM User');
     } catch (err) {
       throw err;
     }
@@ -199,7 +199,7 @@ module.exports = {
 
       await db.run('INSERT INTO User (username, password) VALUES (?, ?)', [
         username,
-        hashedPassword,
+        hashedPassword
       ]);
 
       const adminCredentialsProvided =
@@ -221,5 +221,5 @@ module.exports = {
       console.log(err);
       return false;
     }
-  },
+  }
 };

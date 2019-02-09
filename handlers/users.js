@@ -15,11 +15,15 @@ module.exports.getAll = async (req, res) => {
 
     return res.json({
       success: true,
-      users,
+      users: users.map(user => ({
+        username: user.username,
+        id: user.id
+      }))
     });
   } catch (err) {
     res.status(500).json({
       success: false,
+      error: err
     });
   }
 };
@@ -31,11 +35,16 @@ module.exports.get = async (req, res) => {
     const user = await dataAccessObject.getUserById(userId);
     return res.json({
       success: true,
-      user,
+      user: {
+        username: user.username,
+        id: user.id,
+        roles: user.roles
+      }
     });
   } catch (err) {
     res.status(500).json({
       success: false,
+      error: err
     });
   }
 };
@@ -47,7 +56,7 @@ module.exports.putUsername = async (req, res) => {
   if (!isValidUsername(username)) {
     return res.status(400).json({
       success: false,
-      error: 'Invalid username.',
+      error: 'Invalid username.'
     });
   }
 
@@ -55,11 +64,12 @@ module.exports.putUsername = async (req, res) => {
     await dataAccessObject.updateUserUsername(userId, username);
 
     return res.json({
-      success: true,
+      success: true
     });
   } catch (err) {
     return res.status(500).json({
       success: false,
+      error: err
     });
   }
 };
@@ -71,7 +81,7 @@ module.exports.putPassword = async (req, res) => {
   if (!isValidPassword(password)) {
     return res.status(400).json({
       success: false,
-      error: 'Invalid password.',
+      error: 'Invalid password.'
     });
   }
 
@@ -79,12 +89,34 @@ module.exports.putPassword = async (req, res) => {
     await dataAccessObject.updateUserPassword(userId, password);
 
     return res.json({
-      success: true,
+      success: true
     });
   } catch (err) {
     return res.status(500).json({
       success: false,
-      error: err,
+      error: err
+    });
+  }
+};
+
+module.exports.post = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    await dataAccessObject.addUser(username, password);
+    const user = await dataAccessObject.getUserByName(username);
+
+    res.json({
+      success: true,
+      user: {
+        username: user.username,
+        id: user.id
+      }
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err
     });
   }
 };
