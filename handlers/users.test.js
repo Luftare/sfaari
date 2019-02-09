@@ -1,6 +1,5 @@
 const request = require('supertest');
 const { app, init } = require('../app');
-const { initTestDatabaseState } = require('../databaseTestUtils');
 const parseTokenPayload = require('../utils/parseTokenPayload');
 
 describe('/users', () => {
@@ -53,7 +52,7 @@ describe('/users', () => {
         .set('Authorization', token)
         .set('Accept', 'application/json')
         .send({
-          username: 'newusername',
+          username: 'newusername'
         })
         .expect(200)
         .end((err, res) => {
@@ -81,7 +80,7 @@ describe('/users', () => {
         .set('Authorization', token)
         .set('Accept', 'application/json')
         .send({
-          username: 'newusername',
+          username: 'newusername'
         })
         .expect(403, done);
     });
@@ -95,7 +94,7 @@ describe('/users', () => {
         .set('Authorization', token)
         .set('Accept', 'application/json')
         .send({
-          password: 'newpassword',
+          password: 'newpassword'
         })
         .expect(200)
         .end((err, res) => {
@@ -105,7 +104,7 @@ describe('/users', () => {
             .set('Accept', 'application/json')
             .send({
               username: 'someone',
-              password: 'newpassword',
+              password: 'newpassword'
             })
             .expect(200, done);
         });
@@ -120,7 +119,7 @@ async function loginUser(username, password, onLoggedIn) {
     .set('Accept', 'application/json')
     .send({
       username,
-      password,
+      password
     })
     .expect(200)
     .end((err, res) => {
