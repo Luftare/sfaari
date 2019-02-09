@@ -4,12 +4,23 @@ const router = express.Router();
 const { hasValidToken, hasRoles, ownUserId } = require('./middleware/verifyToken');
 const { admin, login, users } = require('./handlers');
 
-router.post('/login', login.post);
-router.get('/admin', hasValidToken, hasRoles(['admin']), admin.get);
-router.get('/users', users.getAll);
-router.post('/users', users.post);
-router.get('/users/:userId', users.get);
-router.put('/users/:userId/username', hasValidToken, ownUserId, users.putUsername);
-router.put('/users/:userId/password', hasValidToken, ownUserId, users.putPassword);
+router.route('/users')
+  .get(users.getAll)
+  .post(users.post);
+
+router.route('/users/:userId')
+  .get(users.get);
+
+router.route('/users/:userId/username')
+  .put(hasValidToken, ownUserId, users.putUsername);
+
+router.route('/users/:userId/password')
+  .put(hasValidToken, ownUserId, users.putPassword);
+
+router.route('/login')
+  .post(login.post);
+
+router.route('/admin')
+  .get(hasValidToken, hasRoles(['admin']), admin.get);
 
 module.exports = router;
