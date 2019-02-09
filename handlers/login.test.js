@@ -1,37 +1,37 @@
 const request = require('supertest');
 const { app, init } = require('../app');
 
-describe('/login', () => {
-  it('POST /login with invalid credentials', async done => {
+describe('/api/login', () => {
+  it('POST api/login with invalid credentials', async done => {
     await init();
     request(app)
-      .post('/login')
+      .post('/api/login')
       .set('Accept', 'application/json')
       .send({
         username: 'wrongusername',
-        password: 'wrongpassword',
+        password: 'wrongpassword'
       })
       .expect('Content-Type', /json/)
       .expect(403, done);
   });
 
-  it('POST /login with missing credentials', async done => {
+  it('POST api/login with missing credentials', async done => {
     await init();
     request(app)
-      .post('/login')
+      .post('/api/login')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400, done);
   });
 
-  it('POST /login with valid credentials', async done => {
+  it('POST api/login with valid credentials', async done => {
     await init();
     request(app)
-      .post('/login')
+      .post('/api/login')
       .set('Accept', 'application/json')
       .send({
         username: 'someone',
-        password: 'passwordz',
+        password: 'passwordz'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -42,14 +42,14 @@ describe('/login', () => {
       });
   });
 
-  it('POST /login with valid admin credentials', async done => {
+  it('POST api/login with valid admin credentials', async done => {
     await init();
     request(app)
-      .post('/login')
+      .post('/api/login')
       .set('Accept', 'application/json')
       .send({
         username: process.env.ADMIN_USERNAME,
-        password: process.env.ADMIN_PASSWORD,
+        password: process.env.ADMIN_PASSWORD
       })
       .expect('Content-Type', /json/)
       .expect(200)

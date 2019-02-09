@@ -2,11 +2,11 @@ const request = require('supertest');
 const { app, init } = require('../app');
 const parseTokenPayload = require('../utils/parseTokenPayload');
 
-describe('/users', () => {
-  it('GET /users', async done => {
+describe('/api/users', () => {
+  it('GET api/users', async done => {
     await init();
     request(app)
-      .get('/users')
+      .get('/api/users')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -28,10 +28,10 @@ describe('/users', () => {
       });
   });
 
-  it('GET /users/:userId', async done => {
+  it('GET /api/users/:userId', async done => {
     await init();
     request(app)
-      .get('/users/1')
+      .get('/api/users/1')
       .set('Accept', 'application/json')
       .expect(200)
       .end((err, res) => {
@@ -44,9 +44,9 @@ describe('/users', () => {
       });
   });
 
-  it('POST /users', async done => {
+  it('POST /api/users', async done => {
     request(app)
-      .post('/users')
+      .post('/api/users')
       .set('Accept', 'application/json')
       .send({
         username: 'new_mock_user',
@@ -59,15 +59,13 @@ describe('/users', () => {
         expect(res.body.user.id).toBeDefined();
 
         request(app)
-          .get('/users')
+          .get('/api/users')
           .set('Accept', 'application/json')
           .expect(200)
           .end((err, res) => {
             if (err) throw err;
 
-            const user = res.body.users.find(
-              user => user.username === 'new_mock_user'
-            );
+            const user = res.body.users.find(user => user.username === 'new_mock_user');
             expect(user.id).toBeDefined();
             expect(user.username).toEqual('new_mock_user');
             done();
@@ -75,11 +73,11 @@ describe('/users', () => {
       });
   });
 
-  it('PUT /users/:userId/username', async done => {
+  it('PUT /api/users/:userId/username', async done => {
     loginUser('someone', 'passwordz', async token => {
       const { id } = parseTokenPayload(token);
       request(app)
-        .put(`/users/${id}/username`)
+        .put(`/api/users/${id}/username`)
         .set('Authorization', token)
         .set('Accept', 'application/json')
         .send({
@@ -89,7 +87,7 @@ describe('/users', () => {
         .end((err, res) => {
           if (err) throw err;
           request(app)
-            .get('/users')
+            .get('/api/users')
             .set('Authorization', token)
             .set('Accept', 'application/json')
             .expect(200)
@@ -103,11 +101,11 @@ describe('/users', () => {
     });
   });
 
-  it('PUT /users/:userId updating other user username without admin credentials', async done => {
+  it('PUT /api/users/:userId updating other user username without admin credentials', async done => {
     loginUser('someone', 'passwordz', async token => {
       const { id } = parseTokenPayload(token);
       request(app)
-        .put(`/users/${id + 1}/username`)
+        .put(`/api/users/${id + 1}/username`)
         .set('Authorization', token)
         .set('Accept', 'application/json')
         .send({
@@ -117,11 +115,11 @@ describe('/users', () => {
     });
   });
 
-  it('PUT /users/:id/password', async done => {
+  it('PUT /api/users/:id/password', async done => {
     loginUser('someone', 'passwordz', async token => {
       const { id } = parseTokenPayload(token);
       request(app)
-        .put(`/users/${id}/password`)
+        .put(`/api/users/${id}/password`)
         .set('Authorization', token)
         .set('Accept', 'application/json')
         .send({
@@ -131,7 +129,7 @@ describe('/users', () => {
         .end((err, res) => {
           if (err) throw err;
           request(app)
-            .post('/login')
+            .post('/api/login')
             .set('Accept', 'application/json')
             .send({
               username: 'someone',
@@ -146,7 +144,7 @@ describe('/users', () => {
 async function loginUser(username, password, onLoggedIn) {
   await init();
   request(app)
-    .post('/login')
+    .post('/api/login')
     .set('Accept', 'application/json')
     .send({
       username,

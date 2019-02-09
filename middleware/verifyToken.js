@@ -8,8 +8,7 @@ function extractTokenFromString(string) {
 }
 
 function getTokenFromRequest(req) {
-  const authHeader =
-    req.headers['x-access-token'] || req.headers['authorization'];
+  const authHeader = req.headers['x-access-token'] || req.headers['authorization'];
 
   if (!authHeader) {
     return null;

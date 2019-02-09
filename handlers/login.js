@@ -9,14 +9,11 @@ module.exports.post = async (req, res) => {
   if (!requiredCredentialsProvided) {
     return res.status(400).json({
       success: false,
-      error: 'Authentication failed! Please check the request',
+      error: 'Authentication failed! Please check the request'
     });
   }
 
-  const validCredentialsProvided = await dataAccessObject.checkUserCredentialValidity(
-    username,
-    password
-  );
+  const validCredentialsProvided = await dataAccessObject.checkUserCredentialValidity(username, password);
 
   if (validCredentialsProvided) {
     const user = await dataAccessObject.getUserByName(username);
@@ -24,19 +21,19 @@ module.exports.post = async (req, res) => {
     const roles = isAdmin ? ['admin'] : [];
     const id = user.id;
     const token = jwt.sign({ username, id, roles }, process.env.SECRET, {
-      expiresIn: '1h',
+      expiresIn: '1h'
     });
 
     return res.json({
       success: true,
       message: 'Authentication successful!',
       roles,
-      token,
+      token
     });
   } else {
     return res.status(403).json({
       success: false,
-      error: 'Incorrect username or password',
+      error: 'Incorrect username or password'
     });
   }
 };
