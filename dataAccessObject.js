@@ -16,6 +16,7 @@ module.exports = {
       await this.setupDatabaseTables();
     } catch (err) {
       console.log(err);
+      return;
     }
 
     const adminUserExists = await this.userWithUsernameExists(process.env.ADMIN_INIT_USERNAME);

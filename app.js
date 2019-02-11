@@ -2,11 +2,11 @@ const isTestEnvironment = process.env.NODE_ENV === 'test';
 const envFilePath = isTestEnvironment ? './.test-env' : './.env';
 
 require('dotenv').config({ path: envFilePath });
+const bodyParser = require('body-parser');
 const express = require('express');
+const multer = require('multer');
 const app = express();
 const router = require('./router');
-
-const bodyParser = require('body-parser');
 const dataAccessObject = require('./dataAccessObject');
 
 app.use(bodyParser.json());

@@ -1,5 +1,4 @@
 const dataAccessObject = require('../dataAccessObject');
-const parseTokenPayload = require('../utils/parseTokenPayload');
 
 function isValidUsername(username) {
   return username && username.length > 1;
