@@ -48,8 +48,8 @@ describe('/api/login', () => {
       .post('/api/login')
       .set('Accept', 'application/json')
       .send({
-        username: process.env.ADMIN_USERNAME,
-        password: process.env.ADMIN_PASSWORD
+        username: process.env.ADMIN_INIT_USERNAME,
+        password: process.env.ADMIN_INIT_PASSWORD
       })
       .expect('Content-Type', /json/)
       .expect(200)

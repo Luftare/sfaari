@@ -40,8 +40,8 @@ async function loginAdminUser(onLoggedIn) {
     .post('/api/login')
     .set('Accept', 'application/json')
     .send({
-      username: process.env.ADMIN_USERNAME,
-      password: process.env.ADMIN_PASSWORD
+      username: process.env.ADMIN_INIT_USERNAME,
+      password: process.env.ADMIN_INIT_PASSWORD
     })
     .expect(200)
     .end((err, res) => {

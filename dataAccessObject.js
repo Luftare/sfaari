@@ -18,10 +18,10 @@ module.exports = {
       console.log(err);
     }
 
-    const adminUserExists = await this.userWithUsernameExists(process.env.ADMIN_USERNAME);
+    const adminUserExists = await this.userWithUsernameExists(process.env.ADMIN_INIT_USERNAME);
 
     if (!adminUserExists) {
-      await this.addUser(process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD);
+      await this.addUser(process.env.ADMIN_INIT_USERNAME, process.env.ADMIN_INIT_PASSWORD);
     }
 
     if (isTestEnvironment) {
@@ -170,7 +170,7 @@ module.exports = {
       await db.run('INSERT INTO User (username, password) VALUES (?, ?)', [username, hashedPassword]);
 
       const adminCredentialsProvided =
-        username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD;
+        username === process.env.ADMIN_INIT_USERNAME && password === process.env.ADMIN_INIT_PASSWORD;
 
       if (adminCredentialsProvided) {
         const user = await this.getUserByName(username);
