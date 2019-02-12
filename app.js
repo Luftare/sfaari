@@ -11,6 +11,7 @@ const router = require('./router');
 const dataAccessObject = require('./dataAccessObject');
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/', express.static(__dirname + '/client/dist'));
 app.use('/songs', express.static(__dirname + uploadsPath));
 app.use('/api', router);
