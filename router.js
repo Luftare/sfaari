@@ -8,17 +8,21 @@ const mime = require('mime');
 const { hasValidToken, hasRoles, ownUserId } = require('./middleware/verifyToken');
 const { admin, login, users, songs } = require('./handlers');
 
+const isTestEnvironment = process.env.NODE_ENV === 'test';
+
+
 function generateRandomHash() {
   return crypto.randomBytes(8).toString('hex');
 }
 
+const storageDestination = isTestEnvironment ? './test-uploads' : './uploads';
+
 const storage = multer.diskStorage({
-  destination: './uploads',
+  destination: storageDestination,
   filename(req, file, callback) {
     const hash = generateRandomHash();
     const fileExtension = path.extname(file.originalname);
     const fileName = `${hash}${fileExtension}`;
-    req.uploadFileName = fileName;
     callback(null, fileName);
   }
 });
@@ -40,7 +44,7 @@ router.route('/users/:userId/password')
 
 router.route('/songs')
   .get(songs.getAll)
-  .post(upload.single('song'), songs.post);
+  .post(hasValidToken, upload.single('song'), songs.post);
 
 router.route('/login')
   .post(login.post);

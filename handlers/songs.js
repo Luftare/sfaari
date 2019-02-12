@@ -1,12 +1,21 @@
 const dataAccessObject = require('../dataAccessObject');
 
-module.exports.getAll = (req, res) => {
+module.exports.getAll = async (req, res) => {
+  const songs = await dataAccessObject.getAllSongs();
   res.json({
-    songs: []
+    songs
   });
 };
 
-module.exports.post = (req, res) => {
-  console.log('req:', req.file, req.body, req.uploadFileName);
-  res.json({});
+module.exports.post = async (req, res) => {
+  const userId = req.tokenPayload.id;
+  const fileName = req.file.filename;
+  const songName = req.body.songName;
+
+  const song = await dataAccessObject.addSongToUser(songName, fileName, userId);
+
+  res.json({
+    success: true,
+    song
+  });
 };

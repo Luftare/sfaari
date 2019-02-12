@@ -49,12 +49,23 @@ module.exports = {
     );
 
     await this.db.run(
+      `CREATE TABLE IF NOT EXISTS Song
+      (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        fileName TEXT NOT NULL UNIQUE,
+        userId INTEGER NOT NULL,
+        FOREIGN KEY (userId) REFERENCES User(id)
+      )`
+    );
+
+    await this.db.run(
       `CREATE TABLE IF NOT EXISTS UserRole
       (
         userId INTEGER,
         roleId INTEGER,
-        FOREIGN KEY(userId) REFERENCES User(id),
-        FOREIGN KEY(roleId) REFERENCES Role(id)
+        FOREIGN KEY (userId) REFERENCES User (id) ON DELETE CASCADE,
+        FOREIGN KEY (roleId) REFERENCES Role (id) ON DELETE CASCADE
       )`
     );
 
@@ -185,5 +196,14 @@ module.exports = {
       console.log(err);
       return false;
     }
+  },
+
+  async addSongToUser(songName, fileName, userId) {
+    await this.db.run('INSERT INTO Song (name, fileName, userId) VALUES (?, ?, ?)', [songName, fileName, userId]);
+    return await this.db.get('SELECT * FROM Song WHERE fileName = (?)', [fileName]);
+  },
+
+  async getAllSongs() {
+    return await this.db.all('SELECT * FROM Song');
   }
 };
