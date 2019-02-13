@@ -1,11 +1,36 @@
-const fs = require('fs');
-
-module.exports.initTestDatabaseState = async databaseAccessObject => {
-  try {
-    await databaseAccessObject.addUser('someone', 'passwordz');
-    await databaseAccessObject.addUser('someone_else', 'secretysecret');
-    return await databaseAccessObject.addUser('mocker', 'a_p4ssw0rd');
-  } catch (err) {
-    throw err;
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
   }
+}
+
+const mockUsers = [
+  {
+    username: 'someone',
+    password: 'password'
+  },
+  {
+    username: 'mocker',
+    password: 'mock_pass'
+  },
+  {
+    username: 'someone_else',
+    password: 'p455wordz'
+  }
+];
+
+async function initTestDatabaseState(databaseAccessObject) {
+  let lastAddedUser;
+
+  await asyncForEach(mockUsers, async ({ username, password }) => {
+    lastAddedUser = await databaseAccessObject.addUser(username, password);
+  });
+
+  await databaseAccessObject.addSongToUser('Mock song name', 'mock-song.mp3', 'mocked-id', lastAddedUser.id);
+  await databaseAccessObject.addSongToUser('Another', 'song-2.mp3', 'other-id', lastAddedUser.id);
+}
+
+module.exports = {
+  initTestDatabaseState,
+  mockUsers
 };

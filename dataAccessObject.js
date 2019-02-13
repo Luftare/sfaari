@@ -12,14 +12,11 @@ module.exports = {
   db: null,
   async init() {
     this.db = await sqlite.open(databasePath);
-    try {
-      await this.setupDatabaseTables();
-    } catch (err) {
-      console.log(err);
-      return;
-    }
 
-    const adminUserExists = await this.userWithUsernameExists(process.env.ADMIN_INIT_USERNAME);
+    await this.setupDatabaseTables();
+
+    const adminUsers = await this.getUsersWithRoleName('admin');
+    const adminUserExists = adminUsers.length > 0;
 
     if (!adminUserExists) {
       await this.addUser(process.env.ADMIN_INIT_USERNAME, process.env.ADMIN_INIT_PASSWORD);
@@ -74,6 +71,14 @@ module.exports = {
       SELECT 'admin'
       WHERE NOT EXISTS(SELECT 1 FROM Role WHERE name = 'admin')
     `);
+  },
+
+  async getUsersWithRoleName(roleName) {
+    const role = await this.getRoleByName(roleName);
+    return await this.db.all(
+      'SELECT * FROM User INNER JOIN UserRole ON UserRole.userId = User.id AND UserRole.roleId = (?)',
+      [role.id]
+    );
   },
 
   async checkUserCredentialValidity(username, password) {
@@ -131,10 +136,6 @@ module.exports = {
   async updateUserUsername(id, username) {
     const user = await this.getUserById(id);
 
-    if (!user) {
-      return new Error('User not found.');
-    }
-
     return await this.db.run('UPDATE User SET username = (?) WHERE id = (?)', [username, id]);
   },
 
@@ -150,12 +151,8 @@ module.exports = {
   },
 
   async getAllUsers() {
-    try {
-      const { db } = this;
-      return await db.all('SELECT * FROM User');
-    } catch (err) {
-      throw err;
-    }
+    const { db } = this;
+    return await db.all('SELECT * FROM User');
   },
 
   async userWithUsernameExists(username) {
@@ -168,38 +165,42 @@ module.exports = {
     return existingUser && existingUser.username;
   },
 
+  async addRoleToUser(roleName, userId) {
+    const role = await this.getRoleByName(roleName);
+    return await this.db.run('INSERT INTO UserRole (userId, roleId) VALUES (?, ?)', [userId, role.id]);
+  },
+
   async addUser(username, password) {
-    try {
-      const { db } = this;
-      const userExists = await this.userWithUsernameExists(username);
+    const { db } = this;
+    const userExists = await this.userWithUsernameExists(username);
 
-      if (userExists) {
-        return new Error(`User with username of "${username}" already exists!`);
-      }
-
-      const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
-
-      await db.run('INSERT INTO User (username, password) VALUES (?, ?)', [username, hashedPassword]);
-
-      const adminCredentialsProvided =
-        username === process.env.ADMIN_INIT_USERNAME && password === process.env.ADMIN_INIT_PASSWORD;
-
-      if (adminCredentialsProvided) {
-        const user = await this.getUserByName(username);
-        const role = await this.getRoleByName('admin');
-
-        return await db.run('INSERT INTO UserRole (userId, roleId) VALUES (?, ?)', [user.id, role.id]);
-      } else {
-        return;
-      }
-    } catch (err) {
-      console.log(err);
-      return false;
+    if (userExists) {
+      return new Error(`User with username of "${username}" already exists!`);
     }
+
+    const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
+
+    await db.run('INSERT INTO User (username, password) VALUES (?, ?)', [username, hashedPassword]);
+
+    const adminCredentialsProvided =
+      username === process.env.ADMIN_INIT_USERNAME && password === process.env.ADMIN_INIT_PASSWORD;
+
+    const user = await this.getUserByName(username);
+
+    if (adminCredentialsProvided) {
+      await this.addRoleToUser('admin', user.id);
+    }
+
+    return user;
   },
 
   async addSongToUser(songName, fileName, songId, userId) {
-    await this.db.run('INSERT INTO Song (name, fileName, id, userId) VALUES (?, ?, ?, ?)', [songName, fileName, songId, userId]);
+    await this.db.run('INSERT INTO Song (name, fileName, id, userId) VALUES (?, ?, ?, ?)', [
+      songName,
+      fileName,
+      songId,
+      userId
+    ]);
     return await this.db.get('SELECT * FROM Song WHERE fileName = (?)', [fileName]);
   },
 

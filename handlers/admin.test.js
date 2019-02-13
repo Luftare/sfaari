@@ -1,5 +1,6 @@
 const request = require('supertest');
 const { app, init } = require('../app');
+const { mockUsers } = require('../databaseTestUtils');
 
 describe('/api/admin', () => {
   it('GET api/admin with invalid token', async done => {
@@ -11,7 +12,7 @@ describe('/api/admin', () => {
       .expect(403, done);
   });
 
-  it('GET api/admin with valid token', async done => {
+  it('GET /api/admin with valid token', async done => {
     loginAdminUser(token => {
       request(app)
         .get('/api/admin')
@@ -51,13 +52,14 @@ async function loginAdminUser(onLoggedIn) {
 }
 
 async function loginUser(onLoggedIn) {
+  const { username, password } = mockUsers[0];
   await init();
   request(app)
     .post('/api/login')
     .set('Accept', 'application/json')
     .send({
-      username: 'someone',
-      password: 'passwordz'
+      username,
+      password
     })
     .expect(200)
     .end((err, res) => {

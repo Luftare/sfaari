@@ -1,5 +1,6 @@
 const request = require('supertest');
 const { app, init } = require('../app');
+const { mockUsers } = require('../databaseTestUtils');
 
 describe('/api/login', () => {
   it('POST api/login with invalid credentials', async done => {
@@ -25,13 +26,14 @@ describe('/api/login', () => {
   });
 
   it('POST api/login with valid credentials', async done => {
+    const { username, password } = mockUsers[0];
     await init();
     request(app)
       .post('/api/login')
       .set('Accept', 'application/json')
       .send({
-        username: 'someone',
-        password: 'passwordz'
+        username,
+        password
       })
       .expect('Content-Type', /json/)
       .expect(200)

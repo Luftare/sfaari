@@ -4,8 +4,8 @@ const dataAccessObject = require('../dataAccessObject');
 
 const isTestEnvironment = process.env.NODE_ENV === 'test';
 
-module.exports.get = async (req, res) => {
-  const  { songId } = req.params;
+module.exports.getFile = async (req, res) => {
+  const { songId } = req.params;
   const uploadsDirectory = isTestEnvironment ? '../test-uploads' : '../uploads';
   const song = await dataAccessObject.getSongById(songId);
   const songFileName = song.fileName;
@@ -15,6 +15,7 @@ module.exports.get = async (req, res) => {
 
 module.exports.getAll = async (req, res) => {
   const songs = await dataAccessObject.getAllSongs();
+
   res.json({
     success: true,
     songs
@@ -33,4 +34,3 @@ module.exports.post = async (req, res) => {
     song
   });
 };
-

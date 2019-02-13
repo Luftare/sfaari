@@ -24,7 +24,10 @@ const storage = multer.diskStorage({
     const hash = generateRandomHash();
     const fileExtension = path.extname(file.originalname);
     const fileName = `${hash}${fileExtension}`;
-
+    const songName = req.body.songName;
+    const songNameIsValid = songName && songName.length > 0 && songName.length < 100;
+    const fileExtensionIsValid = fileExtension === '.mp3';
+    const validEntry = songNameIsValid && fileExtensionIsValid;
     req.uploadedSongId = hash;
 
     callback(null, fileName);
@@ -50,8 +53,8 @@ router.route('/songs')
   .get(songs.getAll)
   .post(hasValidToken, upload.single('song'), songs.post);
 
-router.route('/songs/:songId')
-  .get(songs.get);
+router.route('/songs/:songId/file')
+  .get(songs.getFile);
 
 router.route('/login')
   .post(login.post);

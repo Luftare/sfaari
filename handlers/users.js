@@ -32,6 +32,7 @@ module.exports.get = async (req, res) => {
 
   try {
     const user = await dataAccessObject.getUserById(userId);
+
     return res.json({
       success: true,
       user: {

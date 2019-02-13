@@ -1,6 +1,7 @@
 const request = require('supertest');
 const { app, init } = require('../app');
 const parseTokenPayload = require('../utils/parseTokenPayload');
+const { mockUsers } = require('../databaseTestUtils');
 
 describe('/api/users', () => {
   it('GET api/users', async done => {
@@ -16,8 +17,8 @@ describe('/api/users', () => {
         expect(users).toBeInstanceOf(Array);
         expect(users).toHaveLength(4);
 
-        ['mocker', 'someone', 'someone_else'].forEach(testName => {
-          expect(users.some(user => user.username === testName)).toBeTruthy();
+        mockUsers.forEach(({ username }) => {
+          expect(users.some(user => user.username === username)).toBeTruthy();
         });
 
         users.forEach(user => {
@@ -74,7 +75,8 @@ describe('/api/users', () => {
   });
 
   it('PUT /api/users/:userId/username', async done => {
-    loginUser('someone', 'passwordz', async token => {
+    const { username, password } = mockUsers[0];
+    loginUser(username, password, async token => {
       const { id } = parseTokenPayload(token);
       request(app)
         .put(`/api/users/${id}/username`)
@@ -102,7 +104,8 @@ describe('/api/users', () => {
   });
 
   it('PUT /api/users/:userId updating other user username without admin credentials', async done => {
-    loginUser('someone', 'passwordz', async token => {
+    const { username, password } = mockUsers[0];
+    loginUser(username, password, async token => {
       const { id } = parseTokenPayload(token);
       request(app)
         .put(`/api/users/${id + 1}/username`)
@@ -116,7 +119,8 @@ describe('/api/users', () => {
   });
 
   it('PUT /api/users/:id/password', async done => {
-    loginUser('someone', 'passwordz', async token => {
+    const { username, password } = mockUsers[0];
+    loginUser(username, password, async token => {
       const { id } = parseTokenPayload(token);
       request(app)
         .put(`/api/users/${id}/password`)
@@ -132,7 +136,7 @@ describe('/api/users', () => {
             .post('/api/login')
             .set('Accept', 'application/json')
             .send({
-              username: 'someone',
+              username,
               password: 'newpassword'
             })
             .expect(200, done);
