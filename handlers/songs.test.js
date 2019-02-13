@@ -74,7 +74,7 @@ describe('/api/songs', () => {
               const newSong = songs.find(song => song.name === 'Mock song');
               expect(newSong.id).toEqual(song.id);
               request(app)
-                .get(`/songs/${newSong.fileName}`)
+                .get(`/api/songs/${newSong.id}`)
                 .expect(200, done);
             });
         });

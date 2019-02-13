@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const mime = require('mime');
+const dataAccessObject = require('./dataAccessObject');
 
 const { hasValidToken, hasRoles, ownUserId } = require('./middleware/verifyToken');
 const { admin, login, users, songs } = require('./handlers');
@@ -23,6 +24,9 @@ const storage = multer.diskStorage({
     const hash = generateRandomHash();
     const fileExtension = path.extname(file.originalname);
     const fileName = `${hash}${fileExtension}`;
+
+    req.uploadedSongId = hash;
+
     callback(null, fileName);
   }
 });
@@ -45,6 +49,9 @@ router.route('/users/:userId/password')
 router.route('/songs')
   .get(songs.getAll)
   .post(hasValidToken, upload.single('song'), songs.post);
+
+router.route('/songs/:songId')
+  .get(songs.get);
 
 router.route('/login')
   .post(login.post);

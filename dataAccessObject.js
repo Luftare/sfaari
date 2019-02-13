@@ -51,8 +51,8 @@ module.exports = {
     await this.db.run(
       `CREATE TABLE IF NOT EXISTS Song
       (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE,
+        id TEXT PRIMARY KEY NOT NULL UNIQUE,
+        name TEXT NOT NULL,
         fileName TEXT NOT NULL UNIQUE,
         userId INTEGER NOT NULL,
         FOREIGN KEY (userId) REFERENCES User(id)
@@ -198,12 +198,16 @@ module.exports = {
     }
   },
 
-  async addSongToUser(songName, fileName, userId) {
-    await this.db.run('INSERT INTO Song (name, fileName, userId) VALUES (?, ?, ?)', [songName, fileName, userId]);
+  async addSongToUser(songName, fileName, songId, userId) {
+    await this.db.run('INSERT INTO Song (name, fileName, id, userId) VALUES (?, ?, ?, ?)', [songName, fileName, songId, userId]);
     return await this.db.get('SELECT * FROM Song WHERE fileName = (?)', [fileName]);
   },
 
   async getAllSongs() {
     return await this.db.all('SELECT * FROM Song');
+  },
+
+  async getSongById(id) {
+    return await this.db.get('SELECT * FROM Song WHERE id = (?)', [id]);
   }
 };
