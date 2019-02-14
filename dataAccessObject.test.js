@@ -14,7 +14,7 @@ describe('Data access object', async () => {
     done();
   });
 
-  describe('when adding a new user', () => {
+  describe('when adding a new user', async () => {
     let addUserResponse;
 
     beforeEach(async done => {
@@ -37,6 +37,66 @@ describe('Data access object', async () => {
 
     it('received details include user roles', () => {
       expect(Array.isArray(addUserResponse.roles)).toBeTruthy();
+    });
+
+    describe('when song is added to user', async () => {
+      let addSongResponse;
+
+      beforeEach(async () => {
+        addSongResponse = await dataAccessObject.addSongToUser(
+          'Mock song name',
+          'some.mp3',
+          'some-id',
+          addUserResponse.id
+        );
+      });
+
+      it('should response with song details', () => {
+        expect(addSongResponse.id).toBeDefined();
+        expect(addSongResponse.name).toBeDefined();
+        expect(addSongResponse.fileName).toBeDefined();
+        expect(addSongResponse.userId).toBeDefined();
+      });
+
+      it('should be present when requesting all songs', async () => {
+        const songs = await dataAccessObject.getAllSongs();
+        const song = songs.find(song => song.name === 'Mock song name');
+        expect(song).toBeDefined();
+      });
+
+      it('should be returned when requested by id', async () => {
+        const song = await dataAccessObject.getSongById(addSongResponse.id);
+        expect(song).toBeDefined();
+      });
+    });
+
+    describe('when password is changed', async () => {
+      let changePasswordResponse;
+
+      beforeEach(async done => {
+        changePasswordResponse = await dataAccessObject.updateUserPassword(addUserResponse.id, 'newmockpassword');
+        done();
+      });
+
+      it('password should be changed and hashed', () => {
+        expect(addUserResponse.id).toEqual(changePasswordResponse.id);
+        expect(addUserResponse.password).not.toEqual(changePasswordResponse.password);
+        expect(changePasswordResponse.password).not.toEqual('newmockpassword');
+      });
+    });
+
+    describe('when username is changed', async () => {
+      let changeUsernameResponse;
+
+      beforeEach(async done => {
+        changeUsernameResponse = await dataAccessObject.updateUserUsername(addUserResponse.id, 'newmockedusername');
+        done();
+      });
+
+      it('username should be changed', () => {
+        expect(addUserResponse.id).toEqual(changeUsernameResponse.id);
+        expect(changeUsernameResponse.username).toEqual('newmockedusername');
+      });
     });
 
     describe('when requesting user by id', async () => {
@@ -69,7 +129,7 @@ describe('Data access object', async () => {
           addRoleToUserResponse = await dataAccessObject.addRoleToUser('mock role', addUserResponse.id);
         });
 
-        it('response should have a the added role included', () => {
+        it('response roles should include added role', () => {
           expect(addRoleToUserResponse.roles.includes('mock role')).toBeTruthy();
         });
 

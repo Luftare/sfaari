@@ -131,14 +131,15 @@ module.exports = {
 
   async updateUserUsername(id, username) {
     const user = await this.getUserById(id);
-
-    return await this.db.run('UPDATE User SET username = (?) WHERE id = (?)', [username, id]);
+    await this.db.run('UPDATE User SET username = (?) WHERE id = (?)', [username, id]);
+    return this.getUserById(id);
   },
 
   async updateUserPassword(id, password) {
     const user = await this.getUserById(id);
     const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
-    return await this.db.run('UPDATE User SET password = (?) WHERE id = (?)', [hashedPassword, id]);
+    await this.db.run('UPDATE User SET password = (?) WHERE id = (?)', [hashedPassword, id]);
+    return this.getUserById(id);
   },
 
   async getAllUsers() {
