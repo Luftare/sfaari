@@ -39,6 +39,22 @@ describe('Data access object', async () => {
       expect(Array.isArray(addUserResponse.roles)).toBeTruthy();
     });
 
+    describe('when user is removed', async () => {
+      let removeUserResponse;
+
+      beforeEach(async done => {
+        removeUserResponse = await dataAccessObject.removeUserById(addUserResponse.id);
+        done();
+      });
+
+      it('removed user should not be present when requesting all users', async () => {
+        const users = await dataAccessObject.getAllUsers();
+        const user = users.find(user => user.id === addUserResponse.id);
+        expect(user).not.toBeDefined();
+        expect(users.length).toEqual(0);
+      });
+    });
+
     describe('when song is added to user', async () => {
       let addSongResponse;
 
@@ -66,7 +82,20 @@ describe('Data access object', async () => {
 
       it('should be returned when requested by id', async () => {
         const song = await dataAccessObject.getSongById(addSongResponse.id);
-        expect(song).toBeDefined();
+        expect(song).toEqual(addSongResponse);
+      });
+
+      describe('when song is removed', async () => {
+        let removeSongResponse;
+
+        beforeEach(async () => {
+          removeSongResponse = await dataAccessObject.removeSongById(addSongResponse.id);
+        });
+
+        it('should not be present when requesting all songs', async () => {
+          const song = await dataAccessObject.getSongById(addSongResponse.id);
+          expect(song).not.toBeDefined();
+        });
       });
     });
 
@@ -78,9 +107,13 @@ describe('Data access object', async () => {
         done();
       });
 
-      it('password should be changed and hashed', () => {
+      it('password should be changed', () => {
         expect(addUserResponse.id).toEqual(changePasswordResponse.id);
         expect(addUserResponse.password).not.toEqual(changePasswordResponse.password);
+      });
+
+      it('password should be hashed', () => {
+        expect(addUserResponse.id).toEqual(changePasswordResponse.id);
         expect(changePasswordResponse.password).not.toEqual('newmockpassword');
       });
     });
@@ -129,8 +162,24 @@ describe('Data access object', async () => {
           addRoleToUserResponse = await dataAccessObject.addRoleToUser('mock role', addUserResponse.id);
         });
 
-        it('response roles should include added role', () => {
+        it('user with role added should be responded', () => {
           expect(addRoleToUserResponse.roles.includes('mock role')).toBeTruthy();
+        });
+
+        describe('when removing role from user', async () => {
+          let removeRoleFromUserResponse;
+
+          beforeEach(async done => {
+            removeRoleFromUserResponse = await dataAccessObject.removeRoleFromUser(
+              addRoleResponse.id,
+              addUserResponse.id
+            );
+            done();
+          });
+
+          it('user should be responded without the role', () => {
+            expect(removeRoleFromUserResponse.roles).toEqual([]);
+          });
         });
 
         describe('when requesting users with the just added role', async () => {

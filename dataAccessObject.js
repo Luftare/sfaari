@@ -165,11 +165,20 @@ module.exports = {
     return await this.getUserById(userId);
   },
 
+  async removeRoleFromUser(roleId, userId) {
+    await this.db.run('DELETE FROM UserRole WHERE roleId = (?) AND userId = (?)', [roleId, userId]);
+    return await this.getUserById(userId);
+  },
+
   async addUser(username, password) {
     const { db } = this;
     const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
     await db.run('INSERT INTO User (username, password) VALUES (?, ?)', [username, hashedPassword]);
     return await this.getUserByUsername(username);
+  },
+
+  async removeUserById(userId) {
+    return await this.db.run('DELETE FROM User WHERE id = (?)', [userId]);
   },
 
   async addSongToUser(songName, fileName, songId, userId) {
@@ -180,6 +189,10 @@ module.exports = {
       userId
     ]);
     return await this.db.get('SELECT * FROM Song WHERE fileName = (?)', [fileName]);
+  },
+
+  async removeSongById(songId) {
+    return await this.db.run('DELETE FROM Song WHERE id = (?)', [songId]);
   },
 
   async getAllSongs() {
