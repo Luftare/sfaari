@@ -11,7 +11,6 @@ const { admin, login, users, songs } = require('./handlers');
 
 const isTestEnvironment = process.env.NODE_ENV === 'test';
 
-
 function generateRandomHash() {
   return crypto.randomBytes(8).toString('hex');
 }

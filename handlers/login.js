@@ -16,11 +16,11 @@ module.exports.post = async (req, res) => {
   const validCredentialsProvided = await dataAccessObject.checkUserCredentialValidity(username, password);
 
   if (validCredentialsProvided) {
-    const user = await dataAccessObject.getUserByName(username);
-    const isAdmin = user.roles.includes('admin');
-    const roles = isAdmin ? ['admin'] : [];
+    const user = await dataAccessObject.getUserByUsername(username);
+    const roles = user.roles;
     const id = user.id;
-    const token = jwt.sign({ username, id, roles }, process.env.SECRET, {
+    const tokenPayload = { username, id, roles };
+    const token = jwt.sign(tokenPayload, process.env.SECRET, {
       expiresIn: '1h'
     });
 

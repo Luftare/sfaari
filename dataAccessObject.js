@@ -1,6 +1,7 @@
 const fs = require('fs');
 const sqlite = require('sqlite');
 const bcrypt = require('bcrypt');
+const { asyncMap } = require('./utils/async');
 const { initTestDatabaseState } = require('./databaseTestUtils');
 
 const isTestEnvironment = process.env.NODE_ENV === 'test';
@@ -14,17 +15,6 @@ module.exports = {
     this.db = await sqlite.open(databasePath);
 
     await this.setupDatabaseTables();
-
-    const adminUsers = await this.getUsersWithRoleName('admin');
-    const adminUserExists = adminUsers.length > 0;
-
-    if (!adminUserExists) {
-      await this.addUser(process.env.ADMIN_INIT_USERNAME, process.env.ADMIN_INIT_PASSWORD);
-    }
-
-    if (isTestEnvironment) {
-      await initTestDatabaseState(this);
-    }
   },
 
   async setupDatabaseTables() {
@@ -65,35 +55,43 @@ module.exports = {
         FOREIGN KEY (roleId) REFERENCES Role (id) ON DELETE CASCADE
       )`
     );
+  },
 
-    await this.db.run(`
-      INSERT INTO Role (name)
-      SELECT 'admin'
-      WHERE NOT EXISTS(SELECT 1 FROM Role WHERE name = 'admin')
-    `);
+  async createRoleWithName(roleName) {
+    await this.db.run(
+      `INSERT INTO Role (name)
+      SELECT (?)
+      WHERE NOT EXISTS(SELECT 1 FROM Role WHERE name = (?))`,
+      [roleName, roleName]
+    );
+    return await this.getRoleByName(roleName);
   },
 
   async getUsersWithRoleName(roleName) {
-    const role = await this.getRoleByName(roleName);
-    return await this.db.all(
-      'SELECT * FROM User INNER JOIN UserRole ON UserRole.userId = User.id AND UserRole.roleId = (?)',
-      [role.id]
+    const users = await this.db.all(
+      `SELECT * 
+      FROM User
+      WHERE EXISTS (
+        SELECT *
+        FROM UserRole
+        INNER JOIN Role
+          ON Role.id = UserRole.roleId
+          AND Role.name = (?)
+      )`,
+      [roleName]
     );
+
+    return await asyncMap(users, async user => await this.getEnrichedUser(user));
   },
 
   async checkUserCredentialValidity(username, password) {
-    try {
-      const user = await this.getUserByName(username);
-      const userExists = user && user.username;
-      if (!userExists) return false;
+    const user = await this.getUserByUsername(username);
+    const userExists = user && user.username;
+    if (!userExists) return false;
 
-      const correctPasswordProvided = await bcrypt.compare(password, user.password);
+    const correctPasswordProvided = await bcrypt.compare(password, user.password);
 
-      return correctPasswordProvided;
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
+    return correctPasswordProvided;
   },
 
   async getRoleByName(name) {
@@ -102,7 +100,7 @@ module.exports = {
     return role;
   },
 
-  async getUserRolesById(id) {
+  async getUserRolesByUserId(id) {
     const rolesObject = await this.db.all(
       `SELECT name FROM Role INNER JOIN UserRole ON Role.id = UserRole.roleId WHERE UserRole.userId = (?)`,
       [id]
@@ -112,10 +110,8 @@ module.exports = {
   },
 
   async getEnrichedUser(user) {
-    if (!user) {
-      return new Error('User not found.');
-    }
-    const roles = await this.getUserRolesById(user.id);
+    if (!user) return null;
+    const roles = await this.getUserRolesByUserId(user.id);
 
     return {
       ...user,
@@ -128,7 +124,7 @@ module.exports = {
     return await this.getEnrichedUser(user);
   },
 
-  async getUserByName(username) {
+  async getUserByUsername(username) {
     const user = await this.db.get(`SELECT * FROM User WHERE username = (?)`, [username]);
     return await this.getEnrichedUser(user);
   },
@@ -141,57 +137,38 @@ module.exports = {
 
   async updateUserPassword(id, password) {
     const user = await this.getUserById(id);
-
-    if (!user) {
-      return new Error('User not found.');
-    }
-
     const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
     return await this.db.run('UPDATE User SET password = (?) WHERE id = (?)', [hashedPassword, id]);
   },
 
   async getAllUsers() {
     const { db } = this;
-    return await db.all('SELECT * FROM User');
+    const users = await db.all('SELECT * FROM User');
+    return await asyncMap(users, async user => await this.getEnrichedUser(user));
   },
 
   async userWithUsernameExists(username) {
-    const existingUser = await this.db.get(
-      `SELECT * FROM User WHERE username = (?)
-      `,
-      [username]
-    );
-
+    const existingUser = await this.db.get('SELECT * FROM User WHERE username = (?)', [username]);
     return existingUser && existingUser.username;
   },
 
   async addRoleToUser(roleName, userId) {
-    const role = await this.getRoleByName(roleName);
-    return await this.db.run('INSERT INTO UserRole (userId, roleId) VALUES (?, ?)', [userId, role.id]);
+    await this.db.run(
+      `INSERT INTO UserRole (userId, roleId)
+      VALUES (
+        ?,
+        (SELECT id FROM Role WHERE name = (?))
+      )`,
+      [userId, roleName]
+    );
+    return await this.getUserById(userId);
   },
 
   async addUser(username, password) {
     const { db } = this;
-    const userExists = await this.userWithUsernameExists(username);
-
-    if (userExists) {
-      return new Error(`User with username of "${username}" already exists!`);
-    }
-
     const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
-
     await db.run('INSERT INTO User (username, password) VALUES (?, ?)', [username, hashedPassword]);
-
-    const adminCredentialsProvided =
-      username === process.env.ADMIN_INIT_USERNAME && password === process.env.ADMIN_INIT_PASSWORD;
-
-    const user = await this.getUserByName(username);
-
-    if (adminCredentialsProvided) {
-      await this.addRoleToUser('admin', user.id);
-    }
-
-    return user;
+    return await this.getUserByUsername(username);
   },
 
   async addSongToUser(songName, fileName, songId, userId) {

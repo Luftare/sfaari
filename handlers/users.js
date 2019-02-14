@@ -104,7 +104,7 @@ module.exports.post = async (req, res) => {
 
   try {
     await dataAccessObject.addUser(username, password);
-    const user = await dataAccessObject.getUserByName(username);
+    const user = await dataAccessObject.getUserByUsername(username);
 
     res.json({
       success: true,
