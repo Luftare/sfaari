@@ -30,10 +30,6 @@ describe('Verify token', () => {
       verifyToken.hasValidToken(req, res, next);
     });
 
-    it('should not set status', () => {
-      expect(res.receivedStatus).not.toBeDefined();
-    });
-
     it('should call next', () => {
       expect(next.mock.calls.length).toEqual(1);
     });

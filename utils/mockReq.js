@@ -10,8 +10,8 @@ const mockJson = () => null;
 
 function mockRes() {
   const res = {
-    receivedStatus: undefined,
-    receivedBody: undefined,
+    receivedStatus: 200,
+    receivedBody: {},
     status: statusNum => {
       res.receivedStatus = statusNum;
       return {

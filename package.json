@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "integration-test": "jest integration-tests",
+    "unit-test": "jest --testPathIgnorePatterns integration-tests",
     "dev": "node .",
     "preinstall": "cd client && npm install"
   },
