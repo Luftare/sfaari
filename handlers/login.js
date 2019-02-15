@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const dataAccessObject = require('../dataAccessObject');
-const isTestEnvironment = process.env.NODE_ENV === 'test';
 
 module.exports.post = async (req, res) => {
   const { username, password } = req.body;
@@ -27,7 +26,11 @@ module.exports.post = async (req, res) => {
     return res.json({
       success: true,
       message: 'Authentication successful!',
-      roles,
+      user: {
+        username: user.username,
+        id: user.id,
+        roles: user.roles
+      },
       token
     });
   } else {

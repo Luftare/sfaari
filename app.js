@@ -30,10 +30,6 @@ async function init() {
     const adminUser = await dataAccessObject.addUser(process.env.ADMIN_INIT_USERNAME, process.env.ADMIN_INIT_PASSWORD);
     await dataAccessObject.addRoleToUser('admin', adminUser.id);
   }
-
-  // if (isTestEnvironment) {
-  //   await initTestDatabaseState(dataAccessObject);
-  // }
 }
 
 module.exports = { app, init };

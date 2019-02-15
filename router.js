@@ -7,7 +7,7 @@ const mime = require('mime');
 const dataAccessObject = require('./dataAccessObject');
 
 const { hasValidToken, hasRoles, ownUserId } = require('./middleware/verifyToken');
-const { admin, login, users, songs } = require('./handlers');
+const { login, users, songs } = require('./handlers');
 
 const isTestEnvironment = process.env.NODE_ENV === 'test';
 
@@ -63,8 +63,5 @@ router.route('/songs/:songId/file')
 
 router.route('/login')
   .post(login.post);
-
-router.route('/admin')
-  .get(hasValidToken, hasRoles(['admin']), admin.get);
 
 module.exports = router;
