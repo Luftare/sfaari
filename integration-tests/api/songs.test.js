@@ -1,33 +1,32 @@
 const request = require('supertest');
 const path = require('path');
 const fs = require('fs');
-const { app, init } = require('../app');
-const { mockUsers } = require('../databaseTestUtils');
+const { app, init } = require('../../app');
+const { mockUsers, initTestDatabaseState } = require('../../databaseTestUtils');
+const dataAccessObject = require('../../dataAccessObject');
 
-const testUploadsDirectoryPath = path.resolve(__dirname, '../test-uploads');
+const testUploadsDirectoryPath = path.resolve(__dirname, '../../test-uploads');
 
 function clearDirectory(directory) {
   const testUploadsDirectoryExists = fs.existsSync(directory);
 
   if (testUploadsDirectoryExists) {
-    fs.readdir(directory, (err, files) => {
-      if (err) throw err;
+    const files = fs.readdirSync(directory);
 
-      for (const file of files) {
-        fs.unlink(path.join(directory, file), err => {
-          if (err) throw err;
-        });
-      }
-    });
+    for (const file of files) {
+      fs.unlinkSync(path.join(directory, file));
+    }
   }
 }
 
-beforeAll(() => {
+beforeAll(done => {
   clearDirectory(testUploadsDirectoryPath);
+  done();
 });
 
-afterAll(() => {
+afterAll(done => {
   clearDirectory(testUploadsDirectoryPath);
+  done();
 });
 
 describe('/api/songs', async () => {
@@ -37,6 +36,7 @@ describe('/api/songs', async () => {
 
     beforeEach(async () => {
       await init();
+      await initTestDatabaseState(dataAccessObject);
       httpMock = request(app);
       response = httpMock.get('/api/songs').set('Accept', 'application/json');
     });
@@ -62,7 +62,7 @@ describe('/api/songs', async () => {
 
     beforeEach(async () => {
       return new Promise(res => {
-        const pathToMockSong = path.resolve(__dirname, '../testAssets/mock-song.mp3');
+        const pathToMockSong = path.resolve(__dirname, '../../testAssets/mock-song.mp3');
 
         getToken(newToken => {
           token = newToken;
@@ -94,15 +94,32 @@ describe('/api/songs', async () => {
       request(app)
         .get('/api/songs')
         .set('Accept', 'application/json')
+        .expect(200)
         .end((err, res) => {
           const { songs } = res.body;
           const song = songs.find(song => song.name === 'Mock song');
           expect(song).toBeDefined();
-          done();
+          response.end(done);
         });
     });
 
-    it('should make the new song file availabble at GET /api/songs/:songId/file', done => {
+    it('should make the new song available at GET /api/songs/:songId', async done => {
+      response.end((err, res) => {
+        const { song } = res.body;
+
+        request(app)
+          .get(`/api/songs/${song.id}`)
+          .set('Accept', 'application/json')
+          .expect(200)
+          .end((err, res) => {
+            const { song } = res.body;
+            expect(song).toBeDefined();
+            done();
+          });
+      });
+    });
+
+    it('should make the new song file available at GET /api/songs/:songId/file', async done => {
       response.end((err, res) => {
         const songId = res.body.song.id;
 
@@ -117,7 +134,6 @@ describe('/api/songs', async () => {
 
 function getToken(cb) {
   const { username, password } = mockUsers[0];
-  let token;
 
   request(app)
     .post('/api/login')

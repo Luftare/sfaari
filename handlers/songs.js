@@ -13,6 +13,13 @@ module.exports.getFile = async (req, res) => {
   res.sendFile(filePath);
 };
 
+module.exports.get = async (req, res) => {
+  const { songId } = req.params;
+  const uploadsDirectory = isTestEnvironment ? '../test-uploads' : '../uploads';
+  const song = await dataAccessObject.getSongById(songId);
+  res.json({ song });
+};
+
 module.exports.getAll = async (req, res) => {
   const songs = await dataAccessObject.getAllSongs();
 

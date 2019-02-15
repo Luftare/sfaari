@@ -31,9 +31,9 @@ async function init() {
     await dataAccessObject.addRoleToUser('admin', adminUser.id);
   }
 
-  if (isTestEnvironment) {
-    await initTestDatabaseState(dataAccessObject);
-  }
+  // if (isTestEnvironment) {
+  //   await initTestDatabaseState(dataAccessObject);
+  // }
 }
 
 module.exports = { app, init };

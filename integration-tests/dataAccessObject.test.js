@@ -1,6 +1,6 @@
 require('dotenv').config({ path: './.test-env' });
-const dataAccessObject = require('./dataAccessObject');
-const { initTestDatabaseState } = require('./databaseTestUtils');
+const dataAccessObject = require('../dataAccessObject');
+const { initTestDatabaseState } = require('../databaseTestUtils');
 
 describe('Data access object', async () => {
   beforeEach(async done => {

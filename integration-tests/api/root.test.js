@@ -1,5 +1,5 @@
 const request = require('supertest');
-const { app, init } = require('../app');
+const { app, init } = require('../../app');
 
 describe('/', () => {
   it('GET /', async done => {

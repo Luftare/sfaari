@@ -1,6 +1,6 @@
 const request = require('supertest');
-const { app, init } = require('../app');
-const { mockUsers } = require('../databaseTestUtils');
+const { app, init } = require('../../app');
+const { mockUsers } = require('../../databaseTestUtils');
 
 describe('/api/login', () => {
   it('POST api/login with invalid credentials', async done => {

@@ -42,6 +42,9 @@ router.route('/users')
 router.route('/users/:userId')
   .get(users.get);
 
+router.route('/users/:userId')
+  .delete(hasValidToken, ownUserId, users.delete);
+
 router.route('/users/:userId/username')
   .put(hasValidToken, ownUserId, users.putUsername);
 
@@ -51,6 +54,9 @@ router.route('/users/:userId/password')
 router.route('/songs')
   .get(songs.getAll)
   .post(hasValidToken, upload.single('song'), songs.post);
+
+router.route('/songs/:songId')
+  .get(songs.get);
 
 router.route('/songs/:songId/file')
   .get(songs.getFile);

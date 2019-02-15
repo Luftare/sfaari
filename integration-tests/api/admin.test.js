@@ -1,6 +1,6 @@
 const request = require('supertest');
-const { app, init } = require('../app');
-const { mockUsers } = require('../databaseTestUtils');
+const { app, init } = require('../../app');
+const { mockUsers } = require('../../databaseTestUtils');
 
 describe('/api/admin', () => {
   it('GET api/admin with invalid token', async done => {

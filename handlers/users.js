@@ -19,10 +19,10 @@ module.exports.getAll = async (req, res) => {
         id: user.id
       }))
     });
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({
       success: false,
-      error: err
+      error
     });
   }
 };
@@ -33,6 +33,13 @@ module.exports.get = async (req, res) => {
   try {
     const user = await dataAccessObject.getUserById(userId);
 
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found.'
+      });
+    }
+
     return res.json({
       success: true,
       user: {
@@ -41,10 +48,10 @@ module.exports.get = async (req, res) => {
         roles: user.roles
       }
     });
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({
       success: false,
-      error: err
+      error
     });
   }
 };
@@ -61,15 +68,20 @@ module.exports.putUsername = async (req, res) => {
   }
 
   try {
-    await dataAccessObject.updateUserUsername(userId, username);
+    const user = await dataAccessObject.updateUserUsername(userId, username);
 
     return res.json({
-      success: true
+      success: true,
+      user: {
+        username: user.username,
+        id: user.id,
+        roles: user.roles
+      }
     });
-  } catch (err) {
+  } catch (error) {
     return res.status(500).json({
       success: false,
-      error: err
+      error
     });
   }
 };
@@ -86,15 +98,20 @@ module.exports.putPassword = async (req, res) => {
   }
 
   try {
-    await dataAccessObject.updateUserPassword(userId, password);
+    const user = await dataAccessObject.updateUserPassword(userId, password);
 
     return res.json({
-      success: true
+      success: true,
+      user: {
+        username: user.username,
+        id: user.id,
+        roles: user.roles
+      }
     });
-  } catch (err) {
+  } catch (error) {
     return res.status(500).json({
       success: false,
-      error: err
+      error
     });
   }
 };
@@ -110,13 +127,31 @@ module.exports.post = async (req, res) => {
       success: true,
       user: {
         username: user.username,
-        id: user.id
+        id: user.id,
+        roles: user.roles
       }
     });
-  } catch (err) {
-    res.status(400).json({
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      error: err
+      error
+    });
+  }
+};
+
+module.exports.delete = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    await dataAccessObject.removeUserById(userId);
+
+    return res.json({
+      success: true
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error
     });
   }
 };
