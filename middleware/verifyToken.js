@@ -18,7 +18,7 @@ function getTokenFromRequest(req) {
 }
 
 module.exports = {
-  async hasValidToken(req, res, next) {
+  hasValidToken(req, res, next) {
     const token = getTokenFromRequest(req);
 
     if (!token) {
@@ -54,7 +54,7 @@ module.exports = {
   },
 
   hasRoles(requiredRoles) {
-    return async (req, res, next) => {
+    return (req, res, next) => {
       const { tokenPayload } = req;
       const userRoles = tokenPayload.roles;
       const hasRoles = requiredRoles.every(role => userRoles.includes(role));

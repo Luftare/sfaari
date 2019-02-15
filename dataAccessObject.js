@@ -141,8 +141,7 @@ module.exports = {
   },
 
   async getAllUsers() {
-    const { db } = this;
-    const users = await db.all('SELECT * FROM User');
+    const users = await this.db.all('SELECT * FROM User');
     return await asyncMap(users, async user => await this.getEnrichedUser(user));
   },
 
@@ -169,9 +168,8 @@ module.exports = {
   },
 
   async addUser(username, password) {
-    const { db } = this;
     const hashedPassword = await bcrypt.hash(password, encryptionSaltRounds);
-    await db.run('INSERT INTO User (username, password) VALUES (?, ?)', [username, hashedPassword]);
+    await this.db.run('INSERT INTO User (username, password) VALUES (?, ?)', [username, hashedPassword]);
     return await this.getUserByUsername(username);
   },
 
