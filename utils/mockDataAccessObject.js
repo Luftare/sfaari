@@ -67,6 +67,7 @@ module.exports = {
   },
 
   async updateUserUsername(id, username) {
+    if (id !== 1) return null;
     return {
       username,
       password: 'mock password',
@@ -76,6 +77,7 @@ module.exports = {
   },
 
   async updateUserPassword(id, password) {
+    if (id !== 1) return null;
     return {
       username: 'mock user',
       password: 'mock password',
@@ -125,6 +127,7 @@ module.exports = {
   },
 
   async removeUserById(userId) {
+    if (userId !== 1) return false;
     return {};
   },
 

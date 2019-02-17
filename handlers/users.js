@@ -1,11 +1,11 @@
 const dataAccessObject = require('../dataAccessObject');
 
 function isValidUsername(username) {
-  return username && username.length > 1;
+  return !!(username && username.length > 1 && username.length < 35);
 }
 
 function isValidPassword(password) {
-  return password && password.length > 4;
+  return !!(password && password.length > 4 && password.length < 125);
 }
 
 module.exports.getAll = async (req, res) => {
@@ -70,6 +70,13 @@ module.exports.putUsername = async (req, res) => {
   try {
     const user = await dataAccessObject.updateUserUsername(userId, username);
 
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found.'
+      });
+    }
+
     return res.json({
       success: true,
       user: {
@@ -99,6 +106,13 @@ module.exports.putPassword = async (req, res) => {
 
   try {
     const user = await dataAccessObject.updateUserPassword(userId, password);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found.'
+      });
+    }
 
     return res.json({
       success: true,
@@ -143,7 +157,14 @@ module.exports.delete = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    await dataAccessObject.removeUserById(userId);
+    const success = await dataAccessObject.removeUserById(userId);
+
+    if (!success) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found.'
+      });
+    }
 
     return res.json({
       success: true
@@ -155,3 +176,6 @@ module.exports.delete = async (req, res) => {
     });
   }
 };
+
+module.exports.isValidUsername = isValidUsername;
+module.exports.isValidPassword = isValidPassword;
