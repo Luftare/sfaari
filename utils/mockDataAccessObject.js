@@ -48,6 +48,7 @@ module.exports = {
   },
 
   async getUserById(id) {
+    if (id !== 1) return null;
     return {
       username: 'mock user',
       password: 'mock password',
