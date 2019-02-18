@@ -149,6 +149,7 @@ module.exports = {
       {
         fileName: 'mockfilename',
         name: 'Mock name',
+        id: 1,
         userId: 1,
         fileName: 'mockfile.mp3'
       }
@@ -156,9 +157,11 @@ module.exports = {
   },
 
   async getSongById(id) {
+    if (id !== 1) return null;
     return {
       fileName: 'mockfilename',
       name: 'Mock name',
+      id: 1,
       userId: 1,
       fileName: 'mockfile.mp3'
     };
