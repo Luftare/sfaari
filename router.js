@@ -44,7 +44,7 @@ const upload = multer({
 });
 
 const uploadErrorHandler = (error, req, res, next) => {
-  if(error) {
+  if(error instanceof multer.MulterError) {
     res.status(400).json({
       success: false,
       error: 'File not supported.'
