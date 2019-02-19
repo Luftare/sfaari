@@ -19,7 +19,7 @@ const storageDestination = isTestEnvironment ? './test-uploads' : './uploads';
 
 const storage = multer.diskStorage({
   destination: storageDestination,
-  filename(req, file, callback) {
+  filename(req, file, next) {
     const hash = generateRandomHash();
     const fileExtension = path.extname(file.originalname);
     const fileName = `${hash}${fileExtension}`;
@@ -29,11 +29,30 @@ const storage = multer.diskStorage({
     const validEntry = songNameIsValid && fileExtensionIsValid;
     req.uploadedSongId = hash;
 
-    callback(null, fileName);
+    next(null, fileName);
   }
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 10 * (10 ** 6),
+    fieldNameSize: 12,
+    fields: 1,
+    headerPairs: 1
+  }
+});
+
+const uploadErrorHandler = (error, req, res, next) => {
+  if(error) {
+    res.status(400).json({
+      success: false,
+      error: 'File not supported.'
+    })
+  } else {
+    next();
+  }
+};
 
 router.route('/users')
   .get(users.getAll)
@@ -53,7 +72,7 @@ router.route('/users/:userId/password')
 
 router.route('/songs')
   .get(songs.getAll)
-  .post(hasValidToken, upload.single('song'), songs.post);
+  .post(hasValidToken, upload.single('song'), uploadErrorHandler, songs.post);
 
 router.route('/songs/:songId')
   .get(songs.get);
