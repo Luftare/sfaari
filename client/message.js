@@ -1,1 +1,0 @@
-export default 'JS added me here.';
