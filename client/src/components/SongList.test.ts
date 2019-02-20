@@ -1,19 +1,26 @@
-import { shallowMount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import SongList from '@/components/SongList.vue';
 import { Song } from '@/interfaces';
+import { mockSongs } from '../testUtils/mockData';
+
+const localVue = createLocalVue();
+
+localVue.use(Vuex);
 
 describe('SongList.vue', () => {
-  it('shallow renders without crashing', () => {
-    const wrapper = shallowMount(SongList);
-
-    expect(wrapper).toBeDefined();
-  });
-
   it('renders all song names', () => {
-    const songs: Song[] = [{ name: 'Some', id: 1 }, { name: 'Other', id: 2 }, { name: 'Mock name', id: 3 }];
+    const songs: Song[] = mockSongs;
 
     const wrapper = shallowMount(SongList, {
-      propsData: { songs }
+      mocks: {
+        $store: {
+          state: {
+            songs: mockSongs
+          }
+        }
+      },
+      localVue
     });
 
     const html = wrapper.html();
