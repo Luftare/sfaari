@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "integration-test": "jest integration-tests",
-    "unit-test": "jest --testPathIgnorePatterns integration-tests",
+    "test": "jest --testPathIgnorePatterns /client && cd client && npm run test:unit",
+    "test:integration": "jest integration-tests",
+    "test:unit": "jest --testPathIgnorePatterns integration-tests /client",
     "dev": "node .",
-    "preinstall": "cd client && npm install"
+    "preinstall": "cd client && npm install && npm run build"
   },
   "author": "",
   "license": "ISC",
