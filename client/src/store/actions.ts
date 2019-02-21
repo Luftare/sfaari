@@ -1,7 +1,11 @@
-import { Song, State } from '../interfaces';
+import { Song } from '../interfaces';
+import axios from 'axios';
 
 export default {
-  requestAllSongs: (context: any) => {
-    console.log('Requesting all songs');
+  requestAllSongs: async (context: any) => {
+    const response: any = await axios.get('/api/songs');
+    const songs: Song[] = response.data.songs;
+
+    context.commit('receiveSongs', { songs });
   }
 };

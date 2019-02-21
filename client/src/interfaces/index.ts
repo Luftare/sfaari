@@ -1,8 +1,6 @@
 export interface Song {
   name: string;
+  fileName: string;
   id: number;
-}
-
-export interface State {
-  songs: Song[];
+  userId: number;
 }

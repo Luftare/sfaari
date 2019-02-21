@@ -1,7 +1,7 @@
-import { Song, State } from '../interfaces';
+import { Song } from '../interfaces';
 
 export default {
-  receiveSongs: (state: State, { songs }: { songs: Song[] }) => {
-    state.songs = songs;
+  receiveSongs: (state: any, payload: any) => {
+    state.songs = payload.songs;
   }
 };

@@ -1,10 +1,10 @@
 import mutations from './mutations';
 import { mockSongs } from '../testUtils/mockData';
-import { Song, State } from '../interfaces';
+import { Song } from '../interfaces';
 
 describe('mutations', () => {
   it('can receive songs', () => {
-    const state: State = {
+    const state: any = {
       songs: []
     };
 

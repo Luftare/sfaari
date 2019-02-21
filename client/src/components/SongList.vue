@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="songs">
+    <h3>Songs:</h3>
     <div v-bind:key="song.id" v-for="song in songs">{{song.name}}</div>
   </div>
 </template>
@@ -12,7 +13,7 @@ import { Song } from '../interfaces';
 @Component
 export default class SongList extends Vue {
   @State songs!: Song[];
-  @Action requestAllSongs;
+  @Action requestAllSongs!: any;
 
   created() {
     this.requestAllSongs();

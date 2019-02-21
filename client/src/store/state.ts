@@ -1,6 +1,4 @@
-import { State } from '../interfaces';
-
-const state: State = {
+const state: any = {
   songs: []
 };
 

@@ -13,6 +13,7 @@ localVue.use(Vuex);
 describe('SongList.vue', () => {
   it('renders all song names', () => {
     const songs: Song[] = mockSongs;
+    const mockDispatch = jest.fn();
 
     const wrapper = shallowMount(SongList, {
       mocks: {
@@ -21,7 +22,7 @@ describe('SongList.vue', () => {
           state: {
             songs: mockSongs
           },
-          dispatch: () => {}
+          dispatch: mockDispatch
         }
       },
       localVue
