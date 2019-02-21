@@ -22,11 +22,11 @@ describe('App.vue', () => {
       localVue
     });
 
-    expect(wrapper.html()).toContain('login');
+    expect(wrapper.html()).toContain('Login');
+    expect(wrapper.html()).not.toContain('Logout');
   });
 
   it('should not display display login link if user is logged in', () => {
-    console.log(store.state.user.loggedIn);
     const wrapper = shallowMount(App, {
       router,
       store,
@@ -35,6 +35,7 @@ describe('App.vue', () => {
 
     store.state.user.loggedIn = true;
 
-    expect(wrapper.html()).not.toContain('login');
+    expect(wrapper.html()).not.toContain('Login');
+    expect(wrapper.html()).toContain('Logout');
   });
 });

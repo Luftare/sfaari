@@ -3,6 +3,7 @@
     <div>
       <router-link to="/">Home</router-link>
       <router-link v-if="!loggedIn" to="/login">Login</router-link>
+      <a v-if="loggedIn">Logout</a>
     </div>
     <router-view></router-view>
   </div>
