@@ -7,5 +7,9 @@ export default {
     const songs: Song[] = response.data.songs;
 
     context.commit('receiveSongs', { songs });
+  },
+
+  selectSong: (context: any, payload: any) => {
+    context.commit('selectSong', payload.song);
   }
 };

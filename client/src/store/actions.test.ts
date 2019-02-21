@@ -16,15 +16,30 @@ jest.mock('axios', () => {
 });
 
 describe('requestAllSongs', () => {
-  it('receives all songs from api', async () => {
+  it('should receive all songs from api', async () => {
     const context = {
       commit: jest.fn()
     };
 
-    const response: any = await actions.requestAllSongs(context);
+    await actions.requestAllSongs(context);
 
     expect(context.commit.mock.calls.length).toEqual(1);
     expect(context.commit.mock.calls[0][0]).toEqual('receiveSongs');
     expect(context.commit.mock.calls[0][1].songs).toEqual(mockSongs);
+  });
+});
+
+describe('selectSong', () => {
+  it('should select song', () => {
+    const context = {
+      commit: jest.fn()
+    };
+    const song = mockSongs[1];
+
+    actions.selectSong(context, { song });
+
+    expect(context.commit.mock.calls.length).toEqual(1);
+    expect(context.commit.mock.calls[0][0]).toEqual('selectSong');
+    expect(context.commit.mock.calls[0][1]).toEqual(song);
   });
 });

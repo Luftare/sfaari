@@ -11,7 +11,7 @@ const localVue = createLocalVue();
 localVue.use(Vuex);
 
 describe('SongList.vue', () => {
-  it('renders all song names', () => {
+  it('should render all song names', () => {
     const songs: Song[] = mockSongs;
     const mockDispatch = jest.fn();
 
@@ -35,7 +35,7 @@ describe('SongList.vue', () => {
     });
   });
 
-  it('refreshes store songs when created', () => {
+  it('should refresh store songs when created', () => {
     const songs: Song[] = mockSongs;
     const mockDispatch = jest.fn();
 

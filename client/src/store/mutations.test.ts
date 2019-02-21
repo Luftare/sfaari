@@ -3,7 +3,7 @@ import { mockSongs } from '../testUtils/mockData';
 import { Song } from '../interfaces';
 
 describe('mutations', () => {
-  it('can receive songs', () => {
+  it('should receive songs', () => {
     const state: any = {
       songs: []
     };
@@ -11,5 +11,16 @@ describe('mutations', () => {
     mutations.receiveSongs(state, { songs: mockSongs });
 
     expect(state.songs).toEqual(mockSongs);
+  });
+
+  it('should select a song', () => {
+    const state: any = {
+      selectedSong: null
+    };
+    const song = mockSongs[1];
+
+    mutations.selectSong(state, song);
+
+    expect(state.selectedSong).toEqual(song);
   });
 });
