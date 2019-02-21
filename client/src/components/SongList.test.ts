@@ -55,4 +55,28 @@ describe('SongList.vue', () => {
     expect(mockDispatch.mock.calls.length).toEqual(1);
     expect(mockDispatch.mock.calls[0][0]).toEqual('requestAllSongs');
   });
+
+  it('should select song when song is clicked', () => {
+    const songs: Song[] = mockSongs;
+    const mockDispatch = jest.fn();
+
+    const wrapper = shallowMount(SongList, {
+      mocks: {
+        $store: {
+          ...store,
+          state: {
+            songs: mockSongs
+          },
+          dispatch: mockDispatch
+        }
+      },
+      localVue
+    });
+
+    wrapper.find('.song').trigger('click');
+
+    expect(mockDispatch.mock.calls.length).toEqual(2);
+    expect(mockDispatch.mock.calls[1][0]).toEqual('selectSong');
+    expect(mockDispatch.mock.calls[1][1]).toEqual({ song: mockSongs[0] });
+  });
 });

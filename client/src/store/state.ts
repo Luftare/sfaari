@@ -1,5 +1,6 @@
 const state: any = {
-  songs: []
+  songs: [],
+  selectedSong: null
 };
 
 export default state;

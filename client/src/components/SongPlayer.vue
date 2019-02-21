@@ -11,7 +11,7 @@ import { Song } from '../interfaces';
 
 @Component
 export default class SongList extends Vue {
-  @State selectedSong!: Song;
+  @State selectedSong!: any;
 
   get songFileEndpointUrl() {
     return this.selectedSong ? `/api/songs/${this.selectedSong.id}/file` : '';
