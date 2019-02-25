@@ -17,6 +17,21 @@ export default {
 
     selectSong: (context: any, payload: any) => {
       context.commit('selectSong', payload.song);
+    },
+
+    uploadSong: async (context: any, payload: any) => {
+      const response: any = await axios.post('/api/songs', payload.data, {
+        headers: {
+          Authorization: context.rootState.user.token
+        }
+      });
+      context.commit('receiveSongs', { songs: response.data.songs });
+    },
+
+    deleteSong: async (context: any, payload: any) => {
+      const songId = payload.song.id;
+      const response: any = await axios.delete(`/api/songs/${songId}`);
+      context.commit('receiveSongs', { songs: response.data.songs });
     }
   },
   mutations: {

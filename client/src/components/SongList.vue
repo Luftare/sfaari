@@ -2,11 +2,18 @@
   <div class="song-list">
     <h3>Songs:</h3>
     <div
-      class="song-list__song"
+      class="song"
       v-bind:key="song.id"
       v-for="song in filteredSongs"
       @click="selectSong({ song })"
-    >{{song.name}}</div>
+    >
+      {{song.name}}
+      <a
+        href="javascript:void(0)"
+        class="song__delete"
+        @click.stop="deleteSong({ song })"
+      >Delete</a>
+    </div>
   </div>
 </template>
 
@@ -21,6 +28,7 @@ const songModule = namespace('song');
 export default class SongList extends Vue {
   @songModule.State songs!: Song[];
   @songModule.Action selectSong!: any;
+  @songModule.Action deleteSong!: any;
   @Prop({ default: null }) userId!: any;
 
   get filteredSongs() {
