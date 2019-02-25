@@ -1,82 +1,54 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import SongList from '@/components/SongList.vue';
-import { Song } from '@/interfaces';
+import { Store } from 'vuex-mock-store';
 import { mockSongs } from '../testUtils/mockData';
-import store from '../store';
-import actions from '../store/actions';
 
 const localVue = createLocalVue();
 
 localVue.use(Vuex);
 
 describe('SongList.vue', () => {
-  it('should render all song names', () => {
-    const songs: Song[] = mockSongs;
-    const mockDispatch = jest.fn();
+  let wrapper: any;
+  let html: any;
+  const store = new Store({
+    getters: {
+      'song/selectSong': mockSongs[0]
+    },
+    state: {
+      song: {
+        selectedSong: null,
+        songs: mockSongs
+      }
+    }
+  });
 
-    const wrapper = shallowMount(SongList, {
+  beforeEach(() => {
+    wrapper = shallowMount(SongList, {
       mocks: {
-        $store: {
-          ...store,
-          state: {
-            songs: mockSongs
-          },
-          dispatch: mockDispatch
-        }
+        $store: store
       },
       localVue
     });
 
-    const html = wrapper.html();
+    html = wrapper.html();
+  });
 
-    songs.forEach((song: Song) => {
-      expect(html).toContain(song.name);
+  it('should render all songs', () => {
+    mockSongs.forEach(song => {
+      expect(html).toContain(mockSongs[0].name);
     });
   });
 
-  it('should refresh store songs when created', () => {
-    const songs: Song[] = mockSongs;
-    const mockDispatch = jest.fn();
-
-    const wrapper = shallowMount(SongList, {
-      mocks: {
-        $store: {
-          ...store,
-          state: {
-            songs: mockSongs
-          },
-          dispatch: mockDispatch
-        }
-      },
-      localVue
+  describe('when a song is clicked', () => {
+    beforeEach(() => {
+      wrapper.find('.song-list__song').trigger('click');
     });
 
-    expect(mockDispatch.mock.calls.length).toEqual(1);
-    expect(mockDispatch.mock.calls[0][0]).toEqual('requestAllSongs');
-  });
-
-  it('should select song when song is clicked', () => {
-    const songs: Song[] = mockSongs;
-    const mockDispatch = jest.fn();
-
-    const wrapper = shallowMount(SongList, {
-      mocks: {
-        $store: {
-          ...store,
-          state: {
-            songs: mockSongs
-          },
-          dispatch: mockDispatch
-        }
-      },
-      localVue
+    it('should select the song', () => {
+      expect(store.dispatch).toHaveBeenCalled();
+      expect(store.dispatch.mock.calls[0][0]).toEqual('song/selectSong');
+      expect(store.dispatch.mock.calls[0][1]).toEqual({ song: mockSongs[0] });
     });
-
-    wrapper.find('.song').trigger('click');
-
-    expect(mockDispatch.mock.calls.length).toEqual(2);
-    expect(mockDispatch.mock.calls[1][0]).toEqual('selectSong');
-    expect(mockDispatch.mock.calls[1][1]).toEqual({ song: mockSongs[0] });
   });
 });

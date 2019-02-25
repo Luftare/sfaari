@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { UserState } from './user';
 
 export interface UserState {
   token: string;
