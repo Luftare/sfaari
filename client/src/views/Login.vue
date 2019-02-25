@@ -6,7 +6,6 @@
       <input v-model="password" placeholder="password" type="password" required>
       <input type="submit">
     </form>
-    {{loggedIn ? 'joo' : 'ei'}}
   </div>
 </template>
 <script lang="ts">
@@ -25,6 +24,8 @@ export default class Login extends Vue {
 
   handleSubmit() {
     const { username, password } = this;
+    this.username = '';
+    this.password = '';
     this.login({ username, password });
   }
 }

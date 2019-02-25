@@ -7,7 +7,7 @@
     "test": "jest --testPathIgnorePatterns /client && cd client && npm run test:unit",
     "test:integration": "jest integration-tests",
     "test:unit": "jest --testPathIgnorePatterns integration-tests /client",
-    "dev": "node .",
+    "dev": "cd client && npm run build && cd .. && node .",
     "preinstall": "cd client && npm install && npm run build"
   },
   "author": "",

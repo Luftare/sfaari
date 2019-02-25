@@ -28,9 +28,21 @@ describe('user module action', () => {
     expect(context.commit.mock.calls[0][1].token).toEqual('mocktoken');
     expect(context.commit.mock.calls[0][1].id).toBeDefined();
   });
+
+  it('should logout', async () => {
+    const context = {
+      commit: jest.fn()
+    };
+
+    user.actions.logout(context);
+
+    expect(context.commit.mock.calls.length).toEqual(1);
+    expect(context.commit.mock.calls[0][0]).toEqual('receiveToken');
+    expect(context.commit.mock.calls[0][1].token).toEqual('');
+  });
 });
 
-describe('user module action', () => {
+describe('user module mutation', () => {
   it('should receive a token', async () => {
     const state = {
       token: ''
@@ -45,7 +57,7 @@ describe('user module action', () => {
 });
 
 describe('user module getter', () => {
-  it('should derive login status from token', () => {
+  it('should return login status', () => {
     const stateWithEmptyToken = {
       token: ''
     };

@@ -28,6 +28,9 @@ export default {
       });
 
       context.commit('receiveToken', response.data);
+    },
+    logout: (context: any) => {
+      context.commit('receiveToken', { token: '' });
     }
   },
   mutations: {
