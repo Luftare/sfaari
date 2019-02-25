@@ -1,7 +1,11 @@
 import axios from 'axios';
+import { UserState } from './user';
 
 export interface UserState {
   token: string;
+  id: any;
+  username: string;
+  roles: any[];
 }
 
 export interface Credentials {
@@ -26,15 +30,23 @@ export default {
         password
       });
 
-      context.commit('receiveToken', response.data);
+      context.commit('receiveUserDetails', response.data);
     },
     logout: (context: any) => {
-      context.commit('receiveToken', { token: '' });
+      context.commit('receiveUserDetails', {
+        token: '',
+        id: null,
+        username: '',
+        roles: []
+      });
     }
   },
   mutations: {
-    receiveToken: (state: UserState, { token }: any) => {
-      state.token = token;
+    receiveUserDetails: (state: UserState, details: UserState) => {
+      state.token = details.token;
+      state.username = details.username;
+      state.id = details.id;
+      state.roles = details.roles;
     }
   }
 };

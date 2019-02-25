@@ -6,7 +6,9 @@ jest.mock('axios', () => {
       Promise.resolve({
         data: {
           token: 'mocktoken',
-          id: 1
+          id: 1,
+          roles: [],
+          username: 'mockname'
         }
       })
     )
@@ -24,9 +26,11 @@ describe('user module action', () => {
     await user.actions.login(context, { username, password });
 
     expect(context.commit.mock.calls.length).toEqual(1);
-    expect(context.commit.mock.calls[0][0]).toEqual('receiveToken');
+    expect(context.commit.mock.calls[0][0]).toEqual('receiveUserDetails');
     expect(context.commit.mock.calls[0][1].token).toEqual('mocktoken');
+    expect(context.commit.mock.calls[0][1].username).toEqual('mockname');
     expect(context.commit.mock.calls[0][1].id).toBeDefined();
+    expect(Array.isArray(context.commit.mock.calls[0][1].roles)).toBeTruthy();
   });
 
   it('should logout', async () => {
@@ -34,36 +38,57 @@ describe('user module action', () => {
       commit: jest.fn()
     };
 
+    const expectedUserDetails = {
+      token: '',
+      id: null,
+      username: '',
+      roles: []
+    };
+
     user.actions.logout(context);
 
     expect(context.commit.mock.calls.length).toEqual(1);
-    expect(context.commit.mock.calls[0][0]).toEqual('receiveToken');
-    expect(context.commit.mock.calls[0][1].token).toEqual('');
+    expect(context.commit.mock.calls[0][0]).toEqual('receiveUserDetails');
+    expect(context.commit.mock.calls[0][1]).toEqual(expectedUserDetails);
   });
 });
 
 describe('user module mutation', () => {
-  it('should receive a token', async () => {
+  it('should receive user details', async () => {
     const state = {
-      token: ''
+      token: '',
+      id: null,
+      username: '',
+      roles: []
     };
 
-    const token = 'mocktoken';
+    const userDetails = {
+      token: 'mocktoken',
+      username: 'mockuser',
+      id: 1,
+      roles: []
+    };
 
-    user.mutations.receiveToken(state, { token });
+    user.mutations.receiveUserDetails(state, userDetails);
 
-    expect(state.token).toEqual('mocktoken');
+    expect(state).toEqual(userDetails);
   });
 });
 
 describe('user module getter', () => {
   it('should return login status', () => {
     const stateWithEmptyToken = {
-      token: ''
+      token: '',
+      id: null,
+      username: '',
+      roles: []
     };
 
     const stateWithToken = {
-      token: 'mocktoken'
+      token: 'mocktoken',
+      id: 1,
+      username: 'mock',
+      roles: []
     };
 
     const userLoggedIn = user.getters.loggedIn(stateWithEmptyToken);

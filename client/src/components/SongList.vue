@@ -4,7 +4,7 @@
     <div
       class="song-list__song"
       v-bind:key="song.id"
-      v-for="song in songs"
+      v-for="song in filteredSongs"
       @click="selectSong({ song })"
     >{{song.name}}</div>
   </div>
@@ -21,5 +21,11 @@ const songModule = namespace('song');
 export default class SongList extends Vue {
   @songModule.State songs!: Song[];
   @songModule.Action selectSong!: any;
+  @Prop({ default: null }) userId!: any;
+
+  get filteredSongs() {
+    if (this.userId === null) return this.songs;
+    return this.songs.filter(song => song.userId === this.userId);
+  }
 }
 </script>

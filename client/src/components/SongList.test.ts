@@ -21,6 +21,9 @@ describe('SongList.vue', () => {
 
   beforeEach(() => {
     wrapper = shallowMount(SongList, {
+      propsData: {
+        userId: 1
+      },
       mocks: {
         $store: store
       },
@@ -34,10 +37,20 @@ describe('SongList.vue', () => {
     expect(wrapper).toBeDefined();
   });
 
-  it('should render all songs', () => {
-    mockSongs.forEach(song => {
-      expect(html).toContain(mockSongs[0].name);
-    });
+  it('should render songs filtered by user', () => {
+    mockSongs
+      .filter(song => song.userId === 1)
+      .forEach(song => {
+        expect(html).toContain(song.name);
+      });
+  });
+
+  it('should not render other user songs', () => {
+    mockSongs
+      .filter(song => song.userId === 2)
+      .forEach(song => {
+        expect(html).not.toContain(song.name);
+      });
   });
 
   describe('when a song is clicked', () => {
