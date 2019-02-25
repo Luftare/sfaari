@@ -1,19 +1,38 @@
 import axios from 'axios';
+import { UserState } from './user';
+
+export interface UserState {
+  token: string;
+}
+
+export interface Credentials {
+  username: string;
+  password: string;
+}
 
 export default {
   namespaced: true,
   state: {
-    loggedIn: false
+    token: ''
+  },
+  getters: {
+    loggedIn: ({ token }: UserState) => {
+      return !!token;
+    }
   },
   actions: {
-    requestToken: async (context: any, { username, password }: { username: string; password: string }) => {
+    login: async (context: any, { username, password }: Credentials) => {
       const response: any = await axios.post('/api/login', {
         username,
         password
       });
 
-      context.commit('receiveToken', { token: response.data.token });
+      context.commit('receiveToken', response.data);
     }
   },
-  mutations: {}
+  mutations: {
+    receiveToken: (state: UserState, { token }: any) => {
+      state.token = token;
+    }
+  }
 };

@@ -5,25 +5,59 @@ jest.mock('axios', () => {
     post: jest.fn(() =>
       Promise.resolve({
         data: {
-          token: 'mocktoken'
+          token: 'mocktoken',
+          id: 1
         }
       })
     )
   };
 });
 
-describe('user module actions', () => {
-  it('should receive token', async () => {
+describe('user module action', () => {
+  it('should login', async () => {
     const context = {
       commit: jest.fn()
     };
     const username = 'mockname';
     const password = 'mockpassword';
 
-    await user.actions.requestToken(context, { username, password });
+    await user.actions.login(context, { username, password });
 
     expect(context.commit.mock.calls.length).toEqual(1);
     expect(context.commit.mock.calls[0][0]).toEqual('receiveToken');
     expect(context.commit.mock.calls[0][1].token).toEqual('mocktoken');
+    expect(context.commit.mock.calls[0][1].id).toBeDefined();
+  });
+});
+
+describe('user module action', () => {
+  it('should receive a token', async () => {
+    const state = {
+      token: ''
+    };
+
+    const token = 'mocktoken';
+
+    user.mutations.receiveToken(state, { token });
+
+    expect(state.token).toEqual('mocktoken');
+  });
+});
+
+describe('user module getter', () => {
+  it('should derive login status from token', () => {
+    const stateWithEmptyToken = {
+      token: ''
+    };
+
+    const stateWithToken = {
+      token: 'mocktoken'
+    };
+
+    const userLoggedIn = user.getters.loggedIn(stateWithEmptyToken);
+    const userLoggedInWithToken = user.getters.loggedIn(stateWithToken);
+
+    expect(userLoggedInWithToken).toBeTruthy();
+    expect(userLoggedIn).toBeFalsy();
   });
 });

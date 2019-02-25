@@ -12,8 +12,10 @@ const { initTestDatabaseState } = require('./databaseTestUtils');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use('/', express.static(__dirname + '/client/dist'));
+// app.use('/', express.static(__dirname + '/client/dist'));
 app.use('/api', router);
+app.use('/', express.static(__dirname + '/client/dist'));
+app.use('*', express.static(__dirname + '/client/dist'));
 
 async function init() {
   await dataAccessObject.init();
