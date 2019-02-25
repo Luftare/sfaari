@@ -2,15 +2,21 @@
   <div class="login">
     <h1>login</h1>
     <form @submit.prevent="handleSubmit">
-      <input v-model="username" placeholder="username" required>
-      <input v-model="password" placeholder="password" type="password" required>
-      <input type="submit">
+      <input v-model="username" placeholder="username" class="login__username" required>
+      <input
+        v-model="password"
+        placeholder="password"
+        type="password"
+        class="login__password"
+        required
+      >
+      <input type="submit" class="login__submit">
     </form>
   </div>
 </template>
 <script lang="ts">
 import { Component, Prop, Model, Vue } from 'vue-property-decorator';
-import { State, Action, Getter, namespace } from 'vuex-class';
+import { Action, namespace } from 'vuex-class';
 
 const userModule = namespace('user');
 
@@ -19,7 +25,6 @@ export default class Login extends Vue {
   username: string = '';
   password: string = '';
 
-  @userModule.Getter loggedIn!: any;
   @userModule.Action login!: any;
 
   handleSubmit() {

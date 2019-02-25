@@ -10,7 +10,7 @@ localVue.use(Vuex);
 
 describe('SongPlayer.vue', () => {
   let wrapper: any;
-  const store = new Store({
+  const store: any = new Store({
     state: {
       song: {
         selectedSong: mockSongs[0],

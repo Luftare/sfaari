@@ -12,12 +12,8 @@ describe('SongList.vue', () => {
   let wrapper: any;
   let html: any;
   const store = new Store({
-    getters: {
-      'song/selectSong': mockSongs[0]
-    },
     state: {
       song: {
-        selectedSong: null,
         songs: mockSongs
       }
     }
@@ -32,6 +28,10 @@ describe('SongList.vue', () => {
     });
 
     html = wrapper.html();
+  });
+
+  it('should render without crashing', () => {
+    expect(wrapper).toBeDefined();
   });
 
   it('should render all songs', () => {
