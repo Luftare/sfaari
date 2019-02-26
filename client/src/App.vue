@@ -18,7 +18,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { State, Getter, Action, namespace } from 'vuex-class';
 
-const parseTokenPayload = (token: string): any => {
+const parseTokenPayload = (token: any): any => {
   return JSON.parse(atob(token.split('.')[1]));
 };
 
@@ -34,24 +34,29 @@ export default class App extends Vue {
 
   created() {
     this.requestAllSongs();
+    this.handleSession();
+  }
 
+  handleSession() {
     const localToken = localStorage.getItem('jwt-token');
+    const sessionExists = !!localToken;
 
-    if (localToken) {
-      const payload = parseTokenPayload(localToken);
-      const tokenExpired = Date.now() > payload.exp * 1000;
+    if (!sessionExists) return;
 
-      if (tokenExpired) {
-        localStorage.removeItem('jwt-token');
-      } else {
-        this.resumeSession({
-          username: payload.username,
-          id: payload.id,
-          roles: payload.roles,
-          token: localToken
-        });
-      }
+    const payload = parseTokenPayload(localToken);
+    const tokenExpired = Date.now() > payload.exp * 1000;
+
+    if (tokenExpired) {
+      localStorage.removeItem('jwt-token');
+      return;
     }
+
+    this.resumeSession({
+      username: payload.username,
+      id: payload.id,
+      roles: payload.roles,
+      token: localToken
+    });
   }
 }
 </script>

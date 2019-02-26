@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Vue from 'vue';
 import { UserState } from './user';
 
 export interface UserState {
@@ -51,10 +52,11 @@ export default {
   },
   mutations: {
     receiveUserDetails: (state: UserState, details: UserState) => {
-      state.token = details.token;
-      state.username = details.username;
-      state.id = details.id;
-      state.roles = details.roles;
+      Vue.set(state, 'token', details.token);
+      Vue.set(state, 'id', details.id);
+      Vue.set(state, 'username', details.username);
+      Vue.set(state, 'id', details.id);
+      Vue.set(state, 'roles', details.roles);
     }
   }
 };

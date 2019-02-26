@@ -15,6 +15,9 @@ describe('SongList.vue', () => {
     state: {
       song: {
         songs: mockSongs
+      },
+      user: {
+        id: 1
       }
     }
   });
@@ -40,6 +43,11 @@ describe('SongList.vue', () => {
     });
   });
 
+  it('should show delete buttons on owned songs only', () => {
+    const deleteSongElements = wrapper.findAll('.song__delete');
+    expect(deleteSongElements.length).toEqual(2);
+  });
+
   describe('when a song is clicked', () => {
     beforeEach(() => {
       wrapper.find('.song').trigger('click');
@@ -63,6 +71,9 @@ describe('SongList.vue with user songs and edit mode', () => {
       state: {
         song: {
           songs: mockSongs
+        },
+        user: {
+          id: 1
         }
       }
     });
