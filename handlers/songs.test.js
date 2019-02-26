@@ -194,3 +194,29 @@ describe('songs.post with missing song name', async () => {
     expect(res.receivedStatus).toEqual(400);
   });
 });
+
+describe('songs.delete', async () => {
+  let req;
+  let res;
+
+  beforeEach(async done => {
+    req = mockReq({
+      params: {
+        songId: 1
+      }
+    });
+
+    req.tokenPayload = {
+      id: 1
+    };
+
+    res = mockRes();
+
+    await songs.delete(req, res);
+    return done();
+  });
+
+  it('should respond with status 200', () => {
+    expect(res.receivedStatus).toEqual(200);
+  });
+});

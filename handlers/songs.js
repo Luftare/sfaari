@@ -63,3 +63,19 @@ module.exports.post = async (req, res) => {
     song
   });
 };
+
+module.exports.delete = async (req, res) => {
+  const songId = req.params.songId;
+
+  try {
+    await dataAccessObject.removeSongById(songId);
+
+    res.json({
+      success: true
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: true
+    });
+  }
+};

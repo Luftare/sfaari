@@ -129,6 +129,34 @@ describe('/api/songs', async () => {
           .expect(200, done);
       });
     });
+
+    describe('DELETE', async () => {
+      let token;
+      let httpMock;
+      let deleteResponse;
+
+      beforeEach(async () => {
+        return new Promise(promiseRes => {
+          response.end((err, res) => {
+            const { song } = res.body;
+
+            getToken(newToken => {
+              token = newToken;
+              httpMock = request(app);
+              deleteResponse = httpMock
+                .delete(`/api/songs/${song.id}`)
+                .set('Accept', 'application/json')
+                .set('Authorization', token);
+              promiseRes();
+            });
+          });
+        });
+      });
+
+      it('should respond with status 200', done => {
+        deleteResponse.expect(200, done);
+      });
+    });
   });
 });
 

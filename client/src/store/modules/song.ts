@@ -30,7 +30,11 @@ export default {
 
     deleteSong: async (context: any, payload: any) => {
       const songId = payload.song.id;
-      const response: any = await axios.delete(`/api/songs/${songId}`);
+      const response: any = await axios.delete(`/api/songs/${songId}`, {
+        headers: {
+          Authorization: context.rootState.user.token
+        }
+      });
       context.commit('receiveSongs', { songs: response.data.songs });
     }
   },

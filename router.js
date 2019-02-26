@@ -82,7 +82,8 @@ router.route('/songs')
   .post(hasValidToken, upload.single('song'), uploadErrorHandler, songs.post);
 
 router.route('/songs/:songId')
-  .get(songs.get);
+  .get(songs.get)
+  .delete(hasValidToken, songs.delete);
 
 router.route('/songs/:songId/file')
   .get(songs.getFile);
