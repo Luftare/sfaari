@@ -30,7 +30,12 @@ export default {
         password
       });
 
-      context.commit('receiveUserDetails', response.data);
+      context.commit('receiveUserDetails', {
+        token: response.data.token,
+        id: response.data.user.id,
+        roles: response.data.user.roles,
+        username: response.data.user.username
+      });
     },
     resumeSession: (context: any, details: UserState) => {
       context.commit('receiveUserDetails', details);

@@ -6,9 +6,11 @@ jest.mock('axios', () => {
       Promise.resolve({
         data: {
           token: 'mocktoken',
-          id: 1,
-          roles: [],
-          username: 'mockname'
+          user: {
+            id: 1,
+            roles: [],
+            username: 'mockname'
+          }
         }
       })
     )
