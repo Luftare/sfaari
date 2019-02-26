@@ -7,7 +7,7 @@
       <a
         v-if="loggedIn"
         class="header__link"
-        @click.prevent="logout"
+        @click.prevent="handleLogout"
         href="javascript:void(0)"
       >Logout</a>
     </div>
@@ -31,6 +31,11 @@ export default class App extends Vue {
   @userModule.Action logout!: any;
   @userModule.Action resumeSession!: any;
   @songModule.Action requestAllSongs!: any;
+
+  handleLogout() {
+    this.logout();
+    this.$router.push('/');
+  }
 
   created() {
     this.requestAllSongs();
