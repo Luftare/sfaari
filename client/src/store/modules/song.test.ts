@@ -55,7 +55,7 @@ describe('song module action', () => {
 
   it('should upload a song', async () => {
     const context = {
-      commit: jest.fn(),
+      dispatch: jest.fn(),
       rootState: {
         user: {
           token: 'mocktoken'
@@ -68,23 +68,26 @@ describe('song module action', () => {
 
     await songModule.actions.uploadSong(context, { song, data });
 
-    expect(context.commit.mock.calls.length).toEqual(1);
-    expect(context.commit.mock.calls[0][0]).toEqual('receiveSongs');
-    expect(context.commit.mock.calls[0][1].songs).toEqual(expectedSongs);
+    expect(context.dispatch.mock.calls.length).toEqual(1);
+    expect(context.dispatch.mock.calls[0][0]).toEqual('requestAllSongs');
   });
 
   it('should delete a song', async () => {
     const context = {
-      commit: jest.fn()
+      dispatch: jest.fn(),
+      rootState: {
+        user: {
+          token: 'mock'
+        }
+      }
     };
     const song = mockSongs[1];
     const expectedSongs = mockSongs.filter(song => song.id !== mockSongs[0].id);
 
     await songModule.actions.deleteSong(context, { song });
 
-    expect(context.commit.mock.calls.length).toEqual(1);
-    expect(context.commit.mock.calls[0][0]).toEqual('receiveSongs');
-    expect(context.commit.mock.calls[0][1].songs).toEqual(expectedSongs);
+    expect(context.dispatch.mock.calls.length).toEqual(1);
+    expect(context.dispatch.mock.calls[0][0]).toEqual('requestAllSongs');
   });
 });
 

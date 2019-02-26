@@ -9,5 +9,14 @@ export default new Vuex.Store({
   state: {},
   mutations: {},
   actions: {},
-  modules
+  modules,
+  plugins: [
+    function persistToken(store: any) {
+      store.subscribe((mutation: any) => {
+        if (mutation.type === 'user/receiveUserDetails') {
+          localStorage.setItem('jwt-token', mutation.payload.token);
+        }
+      });
+    }
+  ]
 });

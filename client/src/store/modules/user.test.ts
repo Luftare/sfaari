@@ -51,6 +51,37 @@ describe('user module action', () => {
     expect(context.commit.mock.calls[0][0]).toEqual('receiveUserDetails');
     expect(context.commit.mock.calls[0][1]).toEqual(expectedUserDetails);
   });
+
+  it('should resume session', () => {
+    const context = {
+      commit: jest.fn()
+    };
+
+    const initUserState = {
+      token: '',
+      id: null,
+      username: '',
+      roles: []
+    };
+
+    const expectedUserDetails = {
+      token: 'mocktoken',
+      id: 1,
+      username: 'mock',
+      roles: ['mock']
+    };
+
+    user.actions.resumeSession(context, {
+      token: 'mocktoken',
+      id: 1,
+      username: 'mock',
+      roles: ['mock']
+    });
+
+    expect(context.commit.mock.calls.length).toEqual(1);
+    expect(context.commit.mock.calls[0][0]).toEqual('receiveUserDetails');
+    expect(context.commit.mock.calls[0][1]).toEqual(expectedUserDetails);
+  });
 });
 
 describe('user module mutation', () => {

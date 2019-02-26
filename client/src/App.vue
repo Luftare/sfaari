@@ -18,6 +18,10 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { State, Getter, Action, namespace } from 'vuex-class';
 
+const parseTokenPayload = (token: string): any => {
+  return JSON.parse(atob(token.split('.')[1]));
+};
+
 const userModule = namespace('user');
 const songModule = namespace('song');
 
@@ -25,10 +29,29 @@ const songModule = namespace('song');
 export default class App extends Vue {
   @userModule.Getter loggedIn!: any;
   @userModule.Action logout!: any;
+  @userModule.Action resumeSession!: any;
   @songModule.Action requestAllSongs!: any;
 
   created() {
     this.requestAllSongs();
+
+    const localToken = localStorage.getItem('jwt-token');
+
+    if (localToken) {
+      const payload = parseTokenPayload(localToken);
+      const tokenExpired = Date.now() > payload.exp * 1000;
+
+      if (tokenExpired) {
+        localStorage.removeItem('jwt-token');
+      } else {
+        this.resumeSession({
+          username: payload.username,
+          id: payload.id,
+          roles: payload.roles,
+          token: localToken
+        });
+      }
+    }
   }
 }
 </script>

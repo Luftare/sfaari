@@ -25,17 +25,19 @@ export default {
           Authorization: context.rootState.user.token
         }
       });
-      context.commit('receiveSongs', { songs: response.data.songs });
+
+      await context.dispatch('requestAllSongs');
     },
 
     deleteSong: async (context: any, payload: any) => {
       const songId = payload.song.id;
-      const response: any = await axios.delete(`/api/songs/${songId}`, {
+      await axios.delete(`/api/songs/${songId}`, {
         headers: {
           Authorization: context.rootState.user.token
         }
       });
-      context.commit('receiveSongs', { songs: response.data.songs });
+
+      await context.dispatch('requestAllSongs');
     }
   },
   mutations: {

@@ -32,6 +32,9 @@ export default {
 
       context.commit('receiveUserDetails', response.data);
     },
+    resumeSession: (context: any, details: UserState) => {
+      context.commit('receiveUserDetails', details);
+    },
     logout: (context: any) => {
       context.commit('receiveUserDetails', {
         token: '',
