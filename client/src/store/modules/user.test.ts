@@ -18,6 +18,23 @@ jest.mock('axios', () => {
 });
 
 describe('user module action', () => {
+  it('should register', async () => {
+    const context = {
+      commit: jest.fn()
+    };
+    const username = 'mockname';
+    const password = 'mockpassword';
+
+    await user.actions.register(context, { username, password });
+
+    expect(context.commit.mock.calls.length).toEqual(1);
+    expect(context.commit.mock.calls[0][0]).toEqual('receiveUserDetails');
+    expect(context.commit.mock.calls[0][1].token).toEqual('mocktoken');
+    expect(context.commit.mock.calls[0][1].username).toEqual('mockname');
+    expect(context.commit.mock.calls[0][1].id).toBeDefined();
+    expect(Array.isArray(context.commit.mock.calls[0][1].roles)).toBeTruthy();
+  });
+
   it('should login', async () => {
     const context = {
       commit: jest.fn()

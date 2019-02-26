@@ -1,4 +1,5 @@
 const dataAccessObject = require('../dataAccessObject');
+const generateToken = require('../generateToken');
 
 function isValidUsername(username) {
   return !!(username && username.length > 1 && username.length < 35);
@@ -136,9 +137,11 @@ module.exports.post = async (req, res) => {
   try {
     await dataAccessObject.addUser(username, password);
     const user = await dataAccessObject.getUserByUsername(username);
+    const { token } = await generateToken(username);
 
     res.json({
       success: true,
+      token,
       user: {
         username: user.username,
         id: user.id,

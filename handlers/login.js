@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
 const dataAccessObject = require('../dataAccessObject');
+const generateToken = require('../generateToken');
 
 module.exports.post = async (req, res) => {
   const { username, password } = req.body;
@@ -15,13 +15,7 @@ module.exports.post = async (req, res) => {
   const validCredentialsProvided = await dataAccessObject.checkUserCredentialValidity(username, password);
 
   if (validCredentialsProvided) {
-    const user = await dataAccessObject.getUserByUsername(username);
-    const roles = user.roles;
-    const id = user.id;
-    const tokenPayload = { username, id, roles };
-    const token = jwt.sign(tokenPayload, process.env.SECRET, {
-      expiresIn: '1h'
-    });
+    const { token, user } = await generateToken(username);
 
     return res.json({
       success: true,

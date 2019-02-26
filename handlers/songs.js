@@ -1,10 +1,11 @@
+const fs = require('fs');
 const path = require('path');
 const dataAccessObject = require('../dataAccessObject');
 const isTestEnvironment = process.env.NODE_ENV === 'test';
+const uploadsDirectory = isTestEnvironment ? '../test-uploads' : '../uploads';
 
 module.exports.getFile = async (req, res) => {
   const { songId } = req.params;
-  const uploadsDirectory = isTestEnvironment ? '../test-uploads' : '../uploads';
   const song = await dataAccessObject.getSongById(songId);
 
   if (!song) {
@@ -21,7 +22,6 @@ module.exports.getFile = async (req, res) => {
 
 module.exports.get = async (req, res) => {
   const { songId } = req.params;
-  const uploadsDirectory = isTestEnvironment ? '../test-uploads' : '../uploads';
   const song = await dataAccessObject.getSongById(songId);
 
   if (!song) {
@@ -68,10 +68,24 @@ module.exports.delete = async (req, res) => {
   const songId = req.params.songId;
 
   try {
-    await dataAccessObject.removeSongById(songId);
+    const song = await dataAccessObject.getSongById(songId);
 
-    res.json({
-      success: true
+    if (!song) {
+      return res.status(404).json({
+        success: false
+      });
+    }
+
+    const filePath = path.join(__dirname, uploadsDirectory, song.fileName);
+
+    fs.unlink(filePath, async err => {
+      if (err) return console.log(err);
+
+      await dataAccessObject.removeSongById(songId);
+
+      res.json({
+        success: true
+      });
     });
   } catch (error) {
     res.status(500).json({

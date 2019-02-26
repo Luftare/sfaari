@@ -134,11 +134,13 @@ describe('/api/songs', async () => {
       let token;
       let httpMock;
       let deleteResponse;
+      let deletedSong;
 
       beforeEach(async () => {
         return new Promise(promiseRes => {
           response.end((err, res) => {
             const { song } = res.body;
+            deletedSong = song;
 
             getToken(newToken => {
               token = newToken;
@@ -155,6 +157,24 @@ describe('/api/songs', async () => {
 
       it('should respond with status 200', done => {
         deleteResponse.expect(200, done);
+      });
+
+      it('should make song unavailable at GET /api/songs/y', done => {
+        deleteResponse.end(() => {
+          request(app)
+            .get(`/api/songs/${deletedSong.id}`)
+            .set('Accept', 'application/json')
+            .expect(404, done);
+        });
+      });
+
+      it('should make song unavailable at GET /api/songs/y/file', done => {
+        deleteResponse.end(() => {
+          request(app)
+            .get(`/api/songs/${deletedSong.id}/file`)
+            .set('Accept', 'application/json')
+            .expect(404, done);
+        });
       });
     });
   });

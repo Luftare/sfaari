@@ -101,9 +101,10 @@ describe('users.post', async () => {
     expect(res.receivedStatus).toEqual(200);
   });
 
-  it('should respond with user details', () => {
-    const { user } = res.receivedBody;
+  it('should respond with user details and token', () => {
+    const { user, token } = res.receivedBody;
 
+    expect(token).toBeDefined();
     expect(Array.isArray(user.roles)).toBeTruthy();
     expect(user.id).toBeDefined();
     expect(user.username).toBeDefined();

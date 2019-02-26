@@ -25,6 +25,19 @@ export default {
     }
   },
   actions: {
+    register: async (context: any, { username, password }: Credentials) => {
+      const response: any = await axios.post('/api/users', {
+        username,
+        password
+      });
+
+      context.commit('receiveUserDetails', {
+        token: response.data.token,
+        id: response.data.user.id,
+        roles: response.data.user.roles,
+        username: response.data.user.username
+      });
+    },
     login: async (context: any, { username, password }: Credentials) => {
       const response: any = await axios.post('/api/login', {
         username,
