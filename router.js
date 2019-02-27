@@ -69,7 +69,7 @@ router.route('/users/:userId')
   .get(users.get);
 
 router.route('/users/:userId')
-  .delete(hasValidToken, ownUserId, users.delete);
+  .delete(hasValidToken, users.delete);
 
 router.route('/users/:userId/username')
   .put(hasValidToken, ownUserId, users.putUsername);

@@ -158,6 +158,15 @@ module.exports.post = async (req, res) => {
 
 module.exports.delete = async (req, res) => {
   const { userId } = req.params;
+  const requesterUserId = req.tokenPayload.id;
+  const deletingOwnAccount = userId === requesterUserId;
+  const isAdmin = req.tokenPayload.roles.includes('admin');
+
+  if (!deletingOwnAccount && !isAdmin) {
+    return res.status(403).json({
+      success: false
+    });
+  }
 
   try {
     const success = await dataAccessObject.removeUserById(userId);

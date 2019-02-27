@@ -365,6 +365,11 @@ describe('users.delete', async () => {
       }
     });
 
+    req.tokenPayload = {
+      id: 1,
+      roles: []
+    };
+
     res = mockRes();
 
     await users.delete(req, res);
@@ -373,6 +378,33 @@ describe('users.delete', async () => {
 
   it('should respond with status 200', () => {
     expect(res.receivedStatus).toEqual(200);
+  });
+});
+
+describe('users.delete for other user', async () => {
+  let req;
+  let res;
+
+  beforeEach(async done => {
+    req = mockReq({
+      params: {
+        userId: 2
+      }
+    });
+
+    req.tokenPayload = {
+      id: 1,
+      roles: []
+    };
+
+    res = mockRes();
+
+    await users.delete(req, res);
+    return done();
+  });
+
+  it('should respond with status 403', () => {
+    expect(res.receivedStatus).toEqual(403);
   });
 });
 
@@ -386,6 +418,11 @@ describe('users.delete with non-existing user id', async () => {
         userId: 123
       }
     });
+
+    req.tokenPayload = {
+      id: 1,
+      roles: ['admin']
+    };
 
     res = mockRes();
 

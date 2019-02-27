@@ -71,8 +71,9 @@ module.exports.delete = async (req, res) => {
     const song = await dataAccessObject.getSongById(songId);
     const userId = req.tokenPayload.id;
     const isAuthorOwnedSong = userId === song.userId;
+    const isAdmin = req.tokenPayload.roles.includes('admin');
 
-    if (!isAuthorOwnedSong) {
+    if (!isAuthorOwnedSong && !isAdmin) {
       return res.status(403).json({
         success: false
       });

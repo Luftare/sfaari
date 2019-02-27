@@ -224,7 +224,7 @@ describe('/api/users', async () => {
         postResponse.end(async (err, res) => {
           postResponseUser = res.body.user;
 
-          login('new_mock_user', 'some_password', token => {
+          login(process.env.ADMIN_INIT_USERNAME, process.env.ADMIN_INIT_PASSWORD, token => {
             deleteUserResponse = request(app)
               .delete(`/api/users/${postResponseUser.id}`)
               .set('Authorization', token)

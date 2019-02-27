@@ -212,7 +212,62 @@ describe('songs.delete', async () => {
     });
 
     req.tokenPayload = {
-      id: 1
+      id: 1,
+      roles: []
+    };
+
+    res = mockRes();
+
+    await songs.delete(req, res);
+    return done();
+  });
+
+  it('should respond with status 200', () => {
+    expect(res.receivedStatus).toEqual(200);
+  });
+});
+
+describe('songs.delete for other user song', async () => {
+  let req;
+  let res;
+
+  beforeEach(async done => {
+    req = mockReq({
+      params: {
+        songId: 1
+      }
+    });
+
+    req.tokenPayload = {
+      id: 2,
+      roles: []
+    };
+
+    res = mockRes();
+
+    await songs.delete(req, res);
+    return done();
+  });
+
+  it('should respond with status 403', () => {
+    expect(res.receivedStatus).toEqual(403);
+  });
+});
+
+describe('songs.delete for other user song as admin', async () => {
+  let req;
+  let res;
+
+  beforeEach(async done => {
+    req = mockReq({
+      params: {
+        songId: 1
+      }
+    });
+
+    req.tokenPayload = {
+      id: 2,
+      roles: ['admin']
     };
 
     res = mockRes();
