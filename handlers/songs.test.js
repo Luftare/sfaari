@@ -5,6 +5,11 @@ const parseTokenPayload = require('../utils/parseTokenPayload');
 const songs = require('./songs');
 
 jest.mock('../dataAccessObject', () => mockDataAccessObject);
+jest.mock('fs', () => {
+  return {
+    unlink: () => {}
+  };
+});
 
 describe('songs.getAll', async () => {
   let req;

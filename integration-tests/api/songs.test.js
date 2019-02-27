@@ -139,6 +139,7 @@ describe('/api/songs', async () => {
       beforeEach(async () => {
         return new Promise(promiseRes => {
           response.end((err, res) => {
+            if (err) throw err;
             const { song } = res.body;
             deletedSong = song;
 

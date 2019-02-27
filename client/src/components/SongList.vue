@@ -1,6 +1,5 @@
 <template>
   <div class="song-list">
-    <h3>Songs:</h3>
     <div
       class="song"
       v-bind:key="song.id"

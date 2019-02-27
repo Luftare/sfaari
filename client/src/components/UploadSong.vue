@@ -1,6 +1,12 @@
 <template>
   <div class="upload-song">
-    <input type="text" v-model="songName" placeholder="name" class="upload-song__song-name">
+    <input
+      type="text"
+      v-model="songName"
+      placeholder="name"
+      class="upload-song__song-name"
+      required
+    >
     <input type="file" @change="handleFileChange" class="upload-song__select-file" required>
     <button class="upload-song__submit" @click.prevent="handleSubmit">Submit</button>
   </div>
@@ -13,20 +19,20 @@ const songModule = namespace('song');
 
 @Component
 export default class SongList extends Vue {
-  formData: any = null;
-  songName: string = 'Jotain';
+  songName: string = '';
+  file: any = null;
 
   @songModule.Action uploadSong!: any;
 
   handleSubmit() {
-    this.uploadSong({ data: this.formData, songName: this.songName });
+    const data = new FormData();
+    data.append('song', this.file);
+    data.append('songName', this.songName);
+    this.uploadSong({ data, songName: this.songName });
   }
 
   handleFileChange(e: any) {
-    const data = new FormData();
-    data.append('songName', this.songName);
-    data.append('song', e.target.files[0]);
-    this.formData = data;
+    this.file = e.target.files[0];
   }
 }
 </script>

@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <h4>All songs:</h4>
     <SongList/>
     <SongPlayer/>
   </div>

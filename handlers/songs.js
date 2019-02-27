@@ -79,7 +79,7 @@ module.exports.delete = async (req, res) => {
     const filePath = path.join(__dirname, uploadsDirectory, song.fileName);
 
     fs.unlink(filePath, async err => {
-      if (err) return console.log(err);
+      if (err) throw err;
 
       await dataAccessObject.removeSongById(songId);
 

@@ -1,6 +1,7 @@
 <template>
   <div class="profile">
     <UploadSong/>
+    <h4>My songs:</h4>
     <SongList v-bind:userId="id"/>
   </div>
 </template>

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --testPathIgnorePatterns /client && cd client && npm run test:unit",
+    "test:all": "jest --testPathIgnorePatterns /client && cd client && npm run test:unit",
+    "test": "jest --testPathIgnorePatterns /client",
     "test:integration": "jest integration-tests",
     "test:unit": "jest --testPathIgnorePatterns integration-tests /client",
     "dev": "node .",
