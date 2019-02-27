@@ -69,6 +69,14 @@ module.exports.delete = async (req, res) => {
 
   try {
     const song = await dataAccessObject.getSongById(songId);
+    const userId = req.tokenPayload.id;
+    const isAuthorOwnedSong = userId === song.userId;
+
+    if (!isAuthorOwnedSong) {
+      return res.status(403).json({
+        success: false
+      });
+    }
 
     if (!song) {
       return res.status(404).json({
